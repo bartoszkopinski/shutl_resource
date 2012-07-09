@@ -33,5 +33,12 @@ module Shutl
         JSON.parse(response.body)[@remote_resource_name.pluralize].map { |h| new(h) }
       end
     end
+
+    def create
+      url = "/#{self.class.instance_variable_get(:@remote_resource_name).pluralize}"
+      response = self.class.post(url)
+
+      response.success?
+    end
   end
 end

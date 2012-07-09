@@ -68,4 +68,33 @@ describe Shutl::RestResource do
       resource.first.instance_variable_get('@b').should == 2
     end
   end
+
+  describe '#create' do
+    let(:resource) { TestRestResource.new(a: 'value', b: 2)  }
+
+    before do
+      @request = stub_request(:post, 'http://host/test_rest_resources').
+        to_return(:status => 200, :body => '{"test_rest_resource": { "a": "value", "b": 2 }}', :headers => {})
+    end
+
+    it 'should send a post request to the endpoint' do
+      resource.create
+
+      @request.should have_been_requested
+
+    end
+
+    it 'should return true when the post succeeds' do
+      resource.create.should eq(true)
+    end
+
+    it 'should return true if the remote server returns an error' do
+      stub_request(:post, 'http://host/test_rest_resources').
+         to_return(:status => 403, :body => '', :headers => {})
+
+      resource.create.should eq(false)
+    end
+  end
+
+
 end
