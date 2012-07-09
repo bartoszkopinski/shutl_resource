@@ -25,6 +25,13 @@ module Shutl
 
         new JSON.parse(response.body)[@remote_resource_name]
       end
+
+      def all
+        url = "/#{@remote_resource_name.pluralize}"
+        response = get(url)
+
+        JSON.parse(response.body)[@remote_resource_name.pluralize].map { |h| new(h) }
+      end
     end
   end
 end

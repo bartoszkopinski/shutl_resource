@@ -15,33 +15,57 @@ describe Shutl::RestResource do
     TestRestResource.should respond_to :delete
   end
 
-  describe 'Class methods' do
+  describe '#find' do
+    before do
+      @request = stub_request(:get, 'http://host/test_rest_resources/a').
+        to_return(:status => 200, :body => '{"test_rest_resource": { "a": "value", "b": 2 }}', :headers => {})
+    end
 
-    describe '#find' do
-      before do
-        @request = stub_request(:get, 'http://host/test_rest_resources/a').
-          to_return(:status => 200, :body => '{"test_rest_resource": { "a": "value", "b": 2 }}', :headers => {})
-      end
+    it 'should query the endpoint' do
+      TestRestResource.find('a')
 
-      it 'should query the endpoint' do
-        TestRestResource.find('a')
+      @request.should have_been_requested
+    end
 
-        @request.should have_been_requested
-      end
+    it 'should parse the result of the body to create an object' do
+      resource = TestRestResource.find('a')
 
-      it 'should parse the result of the body to create an object' do
-        resource = TestRestResource.find('a')
+      resource.should_not be_nil
+      resource.should be_kind_of TestRestResource
+    end
 
-        resource.should_not be_nil
-        resource.should be_kind_of TestRestResource
-      end
+    it 'should assign the attributes based on the json returned' do
+      resource = TestRestResource.find('a')
 
-      it 'should assign the attributes based on the json returned' do
-        resource = TestRestResource.find('a')
+      resource.instance_variable_get('@a').should == 'value'
+      resource.instance_variable_get('@b').should == 2
+    end
+  end
 
-        resource.instance_variable_get('@a').should == 'value'
-        resource.instance_variable_get('@b').should == 2
-      end
+  describe '#all' do
+
+    before do
+      @request = stub_request(:get, 'http://host/test_rest_resources').
+        to_return(:status => 200, :body => '{"test_rest_resources": [{ "a": "value", "b": 2 }]}', :headers => {})
+    end
+
+    it 'should query the endpoint' do
+      TestRestResource.all
+
+      @request.should have_been_requested
+    end
+
+    it 'should parse the result of the body to create an array' do
+      resource = TestRestResource.all
+
+      resource.should have(1).item
+    end
+
+    it 'should assign the attributes based on the json returned' do
+      resource = TestRestResource.all
+
+      resource.first.instance_variable_get('@a').should == 'value'
+      resource.first.instance_variable_get('@b').should == 2
     end
   end
 end
