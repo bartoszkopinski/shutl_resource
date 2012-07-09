@@ -12,6 +12,8 @@ module Shutl
       base.send :include, HTTParty
       base.send :include, Shutl::DynamicResource
       base.send :extend, ClassMethods
+      base.send :headers, { 'Content-Type' => 'application/json' } 
+
       base.instance_variable_set :@remote_resource_name, base.name.underscore
     end
 
@@ -32,13 +34,32 @@ module Shutl
 
         JSON.parse(response.body)[@remote_resource_name.pluralize].map { |h| new(h) }
       end
+
+      def resource_id(variable_name)
+        puts "set resource_id #{variable_name}"
+        instance_variable_set :@resource_id, variable_name
+      end
     end
 
     def create
       url = "/#{self.class.instance_variable_get(:@remote_resource_name).pluralize}"
-      response = self.class.post(url)
+      response = self.class.post(url, body: to_json )
 
       response.success?
+    end
+
+    def delete
+      url = "/#{self.class.instance_variable_get(:@remote_resource_name).pluralize}/#{resource_id}"
+      response = self.class.delete(url)
+
+      response.success?
+    end
+
+    private
+
+    def resource_id
+      resource_name = self.class.instance_variable_get(:@resource_id)
+      instance_variable_get "@#{resource_name}"
     end
   end
 end
