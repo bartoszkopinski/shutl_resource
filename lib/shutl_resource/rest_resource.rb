@@ -55,6 +55,13 @@ module Shutl
       response.success?
     end
 
+    def save
+      url = "/#{self.class.instance_variable_get(:@remote_resource_name).pluralize}/#{resource_id}"
+      response = self.class.put(url, body: to_json)
+
+      response.success?
+    end
+
     private
 
     def resource_id

@@ -142,4 +142,38 @@ describe Shutl::RestResource do
     end
   end
 
+  describe '#save' do
+    it 'should send a delete query to the endpoint' do
+      request = stub_request(:put, 'http://host/test_rest_resources/value')
+
+      resource.save
+
+      request.should have_been_requested
+    end
+
+    it 'should return true if the request succeeds' do
+      stub_request(:put, 'http://host/test_rest_resources/value').
+         to_return(status: 204)
+
+      resource.save.should eq(true)
+    end
+
+    it 'should return false if the request fails' do
+      stub_request(:put, 'http://host/test_rest_resources/value').
+         to_return(status: 400)
+
+      resource.save.should eq(false)
+    end
+
+    it 'should post in the body the json serialized resource' do
+      resource.stub(:to_json).and_return('JSON')
+      request = stub_request(:put, 'http://host/test_rest_resources/value').
+                        with(:body => 'JSON')
+
+      resource.save
+
+      request.should have_been_requested
+    end
+  end
+
 end
