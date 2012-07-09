@@ -43,6 +43,13 @@ describe Shutl::RestResource do
       resource.instance_variable_get('@a').should == 'value'
       resource.instance_variable_get('@b').should == 2
     end
+
+    it 'should raise an exception if the request fails' do
+      stub_request(:get, 'http://host/test_rest_resources/b').
+         to_return(:status => 500)
+
+      lambda { TestRestResource.find('b') }.should raise_error(Shutl::RemoteError)
+    end
   end
 
   describe '#all' do
@@ -69,6 +76,14 @@ describe Shutl::RestResource do
 
       resource.first.instance_variable_get('@a').should == 'value'
       resource.first.instance_variable_get('@b').should == 2
+    end
+
+    it 'should raise an error of the request fails' do
+      stub_request(:get, 'http://host/test_rest_resources').
+         to_return(:status => 403)
+
+      lambda { TestRestResource.all}.should raise_error(Shutl::RemoteError)
+
     end
   end
 
@@ -114,6 +129,13 @@ describe Shutl::RestResource do
       resource.create
 
       request.should have_been_requested
+    end
+
+    it 'should raise an exception if the create is called with the ! and it fails' do
+      request = stub_request(:post, 'http://host/test_rest_resources').
+        to_return(:status => 400)
+
+      lambda { resource.create! }.should raise_error(Shutl::RemoteError)
     end
   end
 
@@ -173,6 +195,14 @@ describe Shutl::RestResource do
       resource.save
 
       request.should have_been_requested
+    end
+
+
+    it 'should raise an error if the update is called with the ! and it fails' do
+      stub_request(:put, 'http://host/test_rest_resources/value').
+         to_return(status: 400)
+
+      lambda { resource.save! }.should raise_error(Shutl::RemoteError)
     end
   end
 
