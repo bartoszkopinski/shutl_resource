@@ -21,7 +21,6 @@ module Shutl
     module ClassMethods
 
       def find(id)
-        puts @remote_resource_name
         url = "/#{@remote_resource_name.pluralize}/#{id}"
         response = get(url)
 
@@ -36,7 +35,6 @@ module Shutl
       end
 
       def resource_id(variable_name)
-        puts "set resource_id #{variable_name}"
         instance_variable_set :@resource_id, variable_name
       end
     end
