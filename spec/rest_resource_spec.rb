@@ -1,0 +1,47 @@
+require_relative '../lib/shutl_resource/rest_resource'
+require 'webmock/rspec'
+
+describe Shutl::RestResource do
+
+  class TestRestResource
+    include Shutl::RestResource
+    base_uri 'http://host'
+  end
+
+  it 'should include the REST verb' do
+    TestRestResource.should respond_to :get
+    TestRestResource.should respond_to :post
+    TestRestResource.should respond_to :post
+    TestRestResource.should respond_to :delete
+  end
+
+  describe 'Class methods' do
+
+    describe '#find' do
+      before do
+        @request = stub_request(:get, 'http://host/test_rest_resources/a').
+          to_return(:status => 200, :body => '{"test_rest_resource": { "a": "value", "b": 2 }}', :headers => {})
+      end
+
+      it 'should query the endpoint' do
+        TestRestResource.find('a')
+
+        @request.should have_been_requested
+      end
+
+      it 'should parse the result of the body to create an object' do
+        resource = TestRestResource.find('a')
+
+        resource.should_not be_nil
+        resource.should be_kind_of TestRestResource
+      end
+
+      it 'should assign the attributes based on the json returned' do
+        resource = TestRestResource.find('a')
+
+        resource.instance_variable_get('@a').should == 'value'
+        resource.instance_variable_get('@b').should == 2
+      end
+    end
+  end
+end
