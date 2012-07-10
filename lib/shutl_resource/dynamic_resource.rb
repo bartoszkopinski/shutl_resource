@@ -25,6 +25,10 @@ module Shutl
       }.to_json(options)
     end
 
+    def update_attributes!(attrs)
+      attrs.each { |property, value| self.instance_variable_set(:"@#{property}", value) }
+    end
+
     protected
 
     def prefix

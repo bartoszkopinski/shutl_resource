@@ -46,4 +46,17 @@ describe Shutl::DynamicResource do
 
     end
   end
+
+  describe 'udpate_attributes!' do
+
+    it 'should replace the attributes' do
+      resource.update_attributes!(a: 'c')
+
+      resource.instance_variable_get(:@a).should == 'c'
+
+    end
+
+    it 'should use a white list permission'
+
+  end
 end
