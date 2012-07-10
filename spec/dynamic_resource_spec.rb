@@ -1,5 +1,4 @@
-require 'json'
-require_relative '../lib/shutl_resource/dynamic_resource'
+require 'spec_helper'
 
 describe Shutl::DynamicResource do
 

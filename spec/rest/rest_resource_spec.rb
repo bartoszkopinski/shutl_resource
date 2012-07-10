@@ -1,10 +1,9 @@
-require_relative '../lib/shutl_resource/rest_resource'
-require 'webmock/rspec'
+require 'spec_helper'
 
-describe Shutl::RestResource do
+describe Shutl::Rest::RestResource do
 
   class TestRestResource
-    include Shutl::RestResource
+    include Shutl::Rest::RestResource
     base_uri 'http://host'
     resource_id :a
   end
