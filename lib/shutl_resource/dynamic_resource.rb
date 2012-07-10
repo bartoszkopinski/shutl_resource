@@ -29,6 +29,14 @@ module Shutl
       attrs.each { |property, value| self.instance_variable_set(:"@#{property}", value) }
     end
 
+
+    def method_missing(method, *args, &block)
+      if self.instance_variables.include?(:"@#{method}")
+        return self.instance_variable_get(:"@#{method}")
+      end
+      super
+    end
+
     protected
 
     def prefix

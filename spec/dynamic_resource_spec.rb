@@ -23,6 +23,14 @@ describe Shutl::DynamicResource do
       resource.instance_variable_get(:@a).should == 'a'
       resource.instance_variable_get(:@b).should == 'b'
     end
+
+    it 'should create a attribute reader' do
+      resource.a().should == 'a'
+    end
+
+    it 'should keep the method not found behaviour' do
+      lambda { resource.notfound() }.should raise_error(NameError)
+    end
   end
 
   describe '#to_json' do
