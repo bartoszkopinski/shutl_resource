@@ -17,6 +17,7 @@ Gem::Specification.new do |gem|
 
   gem.add_dependency 'httparty', '~> 0.8.3'
   gem.add_dependency 'activesupport', '~> 3.2.3'
+  gem.add_dependency 'activemodel', '~> 3.2.3'
   
   gem.add_development_dependency 'rspec', '~> 2.11.0'
   gem.add_development_dependency 'webmock', '~> 1.8.7'
