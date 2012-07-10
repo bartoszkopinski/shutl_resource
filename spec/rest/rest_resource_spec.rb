@@ -136,6 +136,17 @@ describe Shutl::Rest::RestResource do
 
       lambda { resource.create! }.should raise_error(Shutl::RemoteError)
     end
+
+
+    it 'shoud create a new ressource with the attributes' do
+      request = stub_request(:put, "http://host/test_rest_resources/a").
+                        with(:body => '{"test_rest_resource":{"a":"a","b":"b"}}')
+
+      TestRestResource.create!(a: 'a', b: 'b')
+
+      request.should have_been_requested
+    end
+
   end
 
   describe '#delete' do
@@ -202,6 +213,18 @@ describe Shutl::Rest::RestResource do
          to_return(status: 400)
 
       lambda { resource.save! }.should raise_error(Shutl::RemoteError)
+    end
+  end
+
+  describe '#update!' do
+    it 'should post the new json representation' do
+      request = stub_request(:put, "http://host/test_rest_resources/a").
+                        with(:body => '{"test_rest_resource":{"a":"a","b":"b"}}')
+      test_resource = TestRestResource.new
+
+      test_resource.update!(a: 'a', b: 'b')
+
+      request.should have_been_requested
     end
   end
 

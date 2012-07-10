@@ -37,6 +37,10 @@ module Shutl
           JSON.parse(response.body, symbolize_names: true)[@resource_name.pluralize.to_sym].map { |h| create_object(h) }
         end
 
+        def create!(attrs)
+          new(attrs).save!
+        end
+
         def resource_id(variable_name)
           instance_variable_set :@resource_id, variable_name
         end
@@ -69,11 +73,8 @@ module Shutl
         response.success?
       end
 
-      def update
-        save
-      end
-
-      def update!
+      def update!(attrs)
+        update_attributes!(attrs)
         save!
       end
 
