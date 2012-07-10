@@ -41,16 +41,17 @@ module Shutl
           instance_variable_set :@resource_id, variable_name
         end
 
+        def resource_id_name
+          instance_variable_get(:@resource_id).to_sym
+        end
+
+        private
 
         def create_object(args = {})
           unless args.has_key? :id
             args.merge!( { id: args[resource_id_name] })
           end
           new args
-        end
-
-        def resource_id_name
-          instance_variable_get(:@resource_id).to_sym
         end
       end
 

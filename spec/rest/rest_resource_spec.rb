@@ -43,6 +43,12 @@ describe Shutl::Rest::RestResource do
 
       lambda { TestRestResource.find('b') }.should raise_error(Shutl::RemoteError)
     end
+
+    it 'should add a id based on the resource id' do
+      resource = TestRestResource.find('a')
+
+      resource.instance_variable_get('@id').should == 'value'
+    end
   end
 
   describe '#all' do
