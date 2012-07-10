@@ -5,7 +5,14 @@ module Shutl
     include ActiveModel::Serialization
 
     def self.included(base)
-      base.instance_variable_set :@resource_name, base.name.underscore
+      base.send :extend, ClassMethods
+      base.send :resource_name, base.name.underscore
+    end
+
+    module ClassMethods
+      def resource_name(name)
+        instance_variable_set :@resource_name, name
+      end
     end
 
     def initialize(args = {})

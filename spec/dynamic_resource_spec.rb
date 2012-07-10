@@ -6,6 +6,11 @@ describe Shutl::DynamicResource do
     include Shutl::DynamicResource
   end
 
+  class TestOverride
+    include Shutl::DynamicResource
+    resource_name 'a_other_prefix'
+  end
+
   let(:resource) { TestResource.new({ a: 'a', b: 'b' }) }
 
   describe '#initalize' do
@@ -32,6 +37,13 @@ describe Shutl::DynamicResource do
       json = resource.to_json
 
       JSON.parse(json, symbolize_names: true).should == { test_resource: { a: 'a', b: 'b' } } 
+    end
+
+    it 'should be able to overribe the prefix' do
+      json = TestOverride.new({ a: 'a'}).to_json
+
+      JSON.parse(json, symbolize_names: true)[:a_other_prefix].should_not be_empty
+
     end
   end
 end
