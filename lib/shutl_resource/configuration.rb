@@ -4,7 +4,7 @@ module Shutl::Rest
 
   class << self
     def logger
-      @logger ||= Logger.new($stdin)
+      @logger ||= Logger.new($stdout)
     end
 
     def configure

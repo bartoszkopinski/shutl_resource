@@ -2,12 +2,6 @@ require 'spec_helper'
 
 describe Shutl::Rest::RestResource do
 
-  class TestRestResource
-    include Shutl::Rest::RestResource
-    base_uri 'http://host'
-    resource_id :a
-  end
-
   it 'should include the REST verb' do
     TestRestResource.should respond_to :get
     TestRestResource.should respond_to :post
