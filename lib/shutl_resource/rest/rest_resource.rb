@@ -38,7 +38,7 @@ module Shutl
         end
 
         def create!(attrs)
-          new(attrs).save!
+          create_object(attrs).create
         end
 
         def resource_id(variable_name)

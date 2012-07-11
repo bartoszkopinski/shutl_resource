@@ -139,8 +139,8 @@ describe Shutl::Rest::RestResource do
 
 
     it 'shoud create a new ressource with the attributes' do
-      request = stub_request(:put, "http://host/test_rest_resources/a").
-                        with(:body => '{"test_rest_resource":{"a":"a","b":"b"}}')
+      request = stub_request(:post, "http://host/test_rest_resources").
+                        with(:body => '{"test_rest_resource":{"a":"a","b":"b","id":"a"}}')
 
       TestRestResource.create!(a: 'a', b: 'b')
 
