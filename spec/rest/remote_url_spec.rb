@@ -36,10 +36,12 @@ describe Shutl::Rest::RestResource do
       resource_url '/nested/:parent_id/resources/:id'
     end
 
+    let(:resource) { NestedResource.new(id: 2, parent_id: 10) }
+
     describe '#all' do
       it 'should query the correct endpoint' do
         request = stub_request(:get, 'http://host/nested/10/resources').
-                     to_return(body: '{"nested_resources": []}')
+          to_return(body: '{"nested_resources": []}')
 
         NestedResource.all(parent_id: 10)
 
@@ -48,7 +50,7 @@ describe Shutl::Rest::RestResource do
 
       it 'should add the nested params to the attributes' do
         stub_request(:get, 'http://host/nested/10/resources').
-           to_return(body: '{"nested_resources": [{}, {}]}')
+          to_return(body: '{"nested_resources": [{}, {}]}')
 
         resources = NestedResource.all(parent_id: 10)
 
@@ -59,21 +61,55 @@ describe Shutl::Rest::RestResource do
     describe '#find' do
       it 'should query the correct endpoint' do
         request = stub_request(:get, 'http://host/nested/10/resources/2').
-                     to_return(body: '{"nested_resource": {}}')
+          to_return(body: '{"nested_resource": {}}')
 
         NestedResource.find(id: 2, parent_id: 10)
 
         request.should have_been_requested
       end
-  
+
       it 'should add the nested params to the attributes' do
         stub_request(:get, 'http://host/nested/10/resources/2').
-           to_return(body: '{"nested_resource": {}}')
+          to_return(body: '{"nested_resource": {}}')
 
         resource = NestedResource.find(id: 2, parent_id: 10)
 
         resource.parent_id.should == 10
       end
+    end
+
+    describe 'update' do
+      it 'should query the correct endpoint' do
+        request = stub_request(:put, 'http://host/nested/10/resources/2').
+          to_return(body: '{"nested_resource": {}}')
+
+        resource.save
+
+        request.should have_been_requested
+      end
+    end
+
+    describe '#create' do
+      it 'should query the correct endpoint' do
+        request = stub_request(:post, 'http://host/nested/10/resources').
+          to_return(body: '{"nested_resource": {}}')
+
+        resource.create
+
+        request.should have_been_requested
+      end
+    end
+
+    describe '#delete' do
+      it 'should query the correct endpoint' do
+        request = stub_request(:delete, 'http://host/nested/10/resources/2').
+          to_return(body: '{"nested_resource": {}}')
+
+        resource.delete
+
+        request.should have_been_requested
+      end
+
     end
   end
 end

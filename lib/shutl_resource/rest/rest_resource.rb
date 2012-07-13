@@ -79,6 +79,8 @@ module Shutl
           new args
         end
 
+        protected
+
         def generate_url(url_pattern, args)
           url = url_pattern.dup
           args.each { |key,value| url.gsub!(":#{key}", value.to_s) }
@@ -87,14 +89,14 @@ module Shutl
       end
 
       def create
-        url = "/#{self.class.instance_variable_get(:@resource_name).pluralize}"
+        url = self.class.send :generate_url, self.class.remote_collection_url, attributes
         response = self.class.post(url, body: to_json )
 
         response.success?
       end
 
       def delete
-        url = "/#{self.class.instance_variable_get(:@resource_name).pluralize}/#{resource_id}"
+        url = self.class.send :generate_url, self.class.remote_resource_url, attributes
         response = self.class.delete(url)
 
         response.success?
@@ -106,7 +108,7 @@ module Shutl
       end
 
       def save
-        url = "/#{self.class.instance_variable_get(:@resource_name).pluralize}/#{resource_id}"
+        url = self.class.send :generate_url, self.class.remote_resource_url, attributes
         response = self.class.put(url, body: to_json)
 
         response.success?
@@ -126,6 +128,12 @@ module Shutl
 
       def resource_id
         instance_variable_get :"@#{self.class.resource_id_name}"
+      end
+
+      private
+
+      def attributes
+        instance_variables.inject({}) { |h, var| h.merge( { var.to_s.gsub('@','').to_sym => instance_variable_get(var)}) }
       end
 
     end
