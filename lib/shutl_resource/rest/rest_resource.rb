@@ -49,6 +49,22 @@ module Shutl
           instance_variable_get(:@resource_id).to_sym
         end
 
+        def remote_collection_url
+          @remote_collection_url ||= "/#{@resource_name.pluralize}"
+        end
+
+        def remote_resource_url
+          @remote_resource_url ||= "#{remote_collection_url}/:#{resource_id_name}"
+        end
+
+        def collection_url(url)
+          @remote_collection_url = url
+        end
+
+        def resource_url(url)
+          @remote_resource_url = url
+        end
+
         private
 
         def create_object(args = {})
