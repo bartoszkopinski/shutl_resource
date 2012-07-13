@@ -19,22 +19,27 @@ module Shutl
 
       module ClassMethods
 
-        def find(id)
-          url = "/#{@resource_name.pluralize}/#{id}"
+        def find(args)
+          unless args.kind_of?(Hash)
+            id = args
+            args = { resource_id_name => id }
+          end
+          url = generate_url(remote_resource_url, args)
           response = get(url)
 
           raise Shutl::RemoteError.new("Failed to find #{name} with the id #{id}") unless response.success?
 
-          create_object JSON.parse(response.body, symbolize_names: true)[@resource_name.to_sym]
+          attrs = JSON.parse(response.body, symbolize_names: true)[@resource_name.to_sym] 
+          create_object args.merge(attrs)
         end
 
-        def all
-          url = "/#{@resource_name.pluralize}"
+        def all(args = {})
+          url = generate_url(remote_collection_url, args)
           response = get(url)
 
           raise Shutl::RemoteError.new("Failed to find all #{name}") unless response.success?
 
-          JSON.parse(response.body, symbolize_names: true)[@resource_name.pluralize.to_sym].map { |h| create_object(h) }
+          JSON.parse(response.body, symbolize_names: true)[@resource_name.pluralize.to_sym].map { |h| create_object(args.merge(h)) }
         end
 
         def create!(attrs)
@@ -72,6 +77,12 @@ module Shutl
             args.merge!( { id: args[resource_id_name] })
           end
           new args
+        end
+
+        def generate_url(url_pattern, args)
+          url = url_pattern.dup
+          args.each { |key,value| url.gsub!(":#{key}", value.to_s) }
+          url
         end
       end
 
