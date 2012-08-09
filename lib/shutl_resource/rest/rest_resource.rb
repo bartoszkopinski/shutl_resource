@@ -19,12 +19,12 @@ module Shutl
 
       module ClassMethods
 
-        def find(args)
+        def find(args, params = {})
           unless args.kind_of?(Hash)
             id = args
             args = { resource_id_name => id }
           end
-          url = generate_url(remote_resource_url, args)
+          url = generate_url(remote_resource_url, args, params)
           response = get(url)
 
           raise Shutl::RemoteError.new("Failed to find #{name} with the id #{id}") unless response.success?
@@ -34,7 +34,10 @@ module Shutl
         end
 
         def all(args = {})
-          url = generate_url(remote_collection_url, args)
+          partition = args.partition {|key,value| !remote_collection_url.index(":#{key}").nil? }
+          url_args = partition.first.inject({}) { |h,pair| h[pair.first] = pair.last ; h }
+          params   = partition.last.inject({}) { |h,pair| h[pair.first] = pair.last ; h }
+          url = generate_url(remote_collection_url, url_args, params)
           response = get(url)
 
           raise Shutl::RemoteError.new("Failed to find all #{name}") unless response.success?
@@ -81,9 +84,13 @@ module Shutl
 
         protected
 
-        def generate_url(url_pattern, args)
+        def generate_url(url_pattern, args, params = {})
           url = url_pattern.dup
           args.each { |key,value| url.gsub!(":#{key}", value.to_s) }
+          unless params.empty?
+            url += '?'
+            params.each { |key, value| url += "#{key}=#{value}&" }
+          end
           url
         end
       end

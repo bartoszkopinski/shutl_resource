@@ -56,6 +56,15 @@ describe Shutl::Rest::RestResource do
 
         resources.each { |r| r.parent_id.should == 10 }
       end
+
+      it 'should support the params' do
+        request = stub_request(:get, 'http://host/nested/10/resources?arg1=val1&arg2=val2').
+          to_return(body: '{"nested_resources": []}')
+
+        NestedResource.all(parent_id: 10, arg1: 'val1', arg2: 'val2')
+
+        request.should have_been_requested
+      end
     end
 
     describe '#find' do

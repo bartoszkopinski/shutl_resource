@@ -12,77 +12,108 @@ describe Shutl::Rest::RestResource do
   let(:resource) { TestRestResource.new(a: 'value', b: 2)  }
 
   describe '#find' do
-    before do
-      @request = stub_request(:get, 'http://host/test_rest_resources/a').
-        to_return(:status => 200, :body => '{"test_rest_resource": { "a": "value", "b": 2 }}', :headers => {})
+    context 'with no arguments' do
+      before do
+        @request = stub_request(:get, 'http://host/test_rest_resources/a').
+          to_return(:status => 200, :body => '{"test_rest_resource": { "a": "value", "b": 2 }}', :headers => {})
+      end
+
+      it 'should query the endpoint' do
+        TestRestResource.find('a')
+
+        @request.should have_been_requested
+      end
+
+      it 'should parse the result of the body to create an object' do
+        resource = TestRestResource.find('a')
+
+        resource.should_not be_nil
+        resource.should be_kind_of TestRestResource
+      end
+
+      it 'should assign the attributes based on the json returned' do
+        resource = TestRestResource.find('a')
+
+        resource.instance_variable_get('@a').should == 'value'
+        resource.instance_variable_get('@b').should == 2
+      end
+
+      it 'should raise an exception if the request fails' do
+        stub_request(:get, 'http://host/test_rest_resources/b').
+          to_return(:status => 500)
+
+        lambda { TestRestResource.find('b') }.should raise_error(Shutl::RemoteError)
+      end
+
+      it 'should add a id based on the resource id' do
+        resource = TestRestResource.find('a')
+
+        resource.instance_variable_get('@id').should == 'value'
+      end
     end
 
-    it 'should query the endpoint' do
-      TestRestResource.find('a')
+    context 'with url arguments' do
+      before do
+        @request = stub_request(:get, 'http://host/test_rest_resources/a?arg1=val1&arg2=val2').
+          to_return(:status => 200, :body => '{"test_rest_resource": { "a": "value", "b": 2 }}', :headers => {})
+      end
 
-      @request.should have_been_requested
-    end
+      it 'should query the endpoint with the parameters' do
+        TestRestResource.find('a', arg1: 'val1', arg2: 'val2')
 
-    it 'should parse the result of the body to create an object' do
-      resource = TestRestResource.find('a')
+        @request.should have_been_requested
+      end
 
-      resource.should_not be_nil
-      resource.should be_kind_of TestRestResource
-    end
-
-    it 'should assign the attributes based on the json returned' do
-      resource = TestRestResource.find('a')
-
-      resource.instance_variable_get('@a').should == 'value'
-      resource.instance_variable_get('@b').should == 2
-    end
-
-    it 'should raise an exception if the request fails' do
-      stub_request(:get, 'http://host/test_rest_resources/b').
-         to_return(:status => 500)
-
-      lambda { TestRestResource.find('b') }.should raise_error(Shutl::RemoteError)
-    end
-
-    it 'should add a id based on the resource id' do
-      resource = TestRestResource.find('a')
-
-      resource.instance_variable_get('@id').should == 'value'
     end
   end
 
   describe '#all' do
 
-    before do
-      @request = stub_request(:get, 'http://host/test_rest_resources').
-        to_return(:status => 200, :body => '{"test_rest_resources": [{ "a": "value", "b": 2 }]}', :headers => {})
+    context 'with no arguments' do
+      before do
+        @request = stub_request(:get, 'http://host/test_rest_resources').
+          to_return(:status => 200, :body => '{"test_rest_resources": [{ "a": "value", "b": 2 }]}', :headers => {})
+      end
+
+      it 'should query the endpoint' do
+        TestRestResource.all
+
+        @request.should have_been_requested
+      end
+
+      it 'should parse the result of the body to create an array' do
+        resource = TestRestResource.all
+
+        resource.should have(1).item
+      end
+
+      it 'should assign the attributes based on the json returned' do
+        resource = TestRestResource.all
+
+        resource.first.instance_variable_get('@a').should == 'value'
+        resource.first.instance_variable_get('@b').should == 2
+      end
+
+      it 'should raise an error of the request fails' do
+        stub_request(:get, 'http://host/test_rest_resources').
+          to_return(:status => 403)
+
+        lambda { TestRestResource.all}.should raise_error(Shutl::RemoteError)
+
+      end
     end
 
-    it 'should query the endpoint' do
-      TestRestResource.all
+    context 'with no arguments' do
+      before do
+        @request = stub_request(:get, 'http://host/test_rest_resources?arg1=val1&arg2=val2').
+          to_return(:status => 200, :body => '{"test_rest_resources": [{ "a": "value", "b": 2 }]}', :headers => {})
+      end
 
-      @request.should have_been_requested
-    end
+      it 'should query the endpoint' do
+        TestRestResource.all(arg1: 'val1', arg2: 'val2')
 
-    it 'should parse the result of the body to create an array' do
-      resource = TestRestResource.all
-
-      resource.should have(1).item
-    end
-
-    it 'should assign the attributes based on the json returned' do
-      resource = TestRestResource.all
-
-      resource.first.instance_variable_get('@a').should == 'value'
-      resource.first.instance_variable_get('@b').should == 2
-    end
-
-    it 'should raise an error of the request fails' do
-      stub_request(:get, 'http://host/test_rest_resources').
-         to_return(:status => 403)
-
-      lambda { TestRestResource.all}.should raise_error(Shutl::RemoteError)
-
+        @request.should have_been_requested
+      end
     end
   end
 
@@ -104,13 +135,13 @@ describe Shutl::Rest::RestResource do
 
     it 'should return true if the remote server returns an error' do
       request = stub_request(:post, 'http://host/test_rest_resources').
-         to_return(:status => 403, :body => '', :headers => {})
+        to_return(:status => 403, :body => '', :headers => {})
 
       resource.create.should eq(false)
 
       request.should have_been_requested
     end
-    
+
     it 'should post in the body the json serialized resource' do
       resource.stub(:to_json).and_return('JSON')
       request = stub_request(:post, 'http://host/test_rest_resources').
@@ -140,7 +171,7 @@ describe Shutl::Rest::RestResource do
 
     it 'shoud create a new ressource with the attributes' do
       request = stub_request(:post, "http://host/test_rest_resources").
-                        with(:body => '{"test_rest_resource":{"a":"a","b":"b","id":"a"}}')
+        with(:body => '{"test_rest_resource":{"a":"a","b":"b","id":"a"}}')
 
       TestRestResource.create!(a: 'a', b: 'b')
 
@@ -161,14 +192,14 @@ describe Shutl::Rest::RestResource do
 
     it 'should return true if the request succeeds' do
       stub_request(:delete, 'http://host/test_rest_resources/value').
-         to_return(status: 204)
+        to_return(status: 204)
 
       resource.delete.should eq(true)
     end
 
     it 'should return false if the request fails' do
       stub_request(:delete, 'http://host/test_rest_resources/value').
-         to_return(status: 400)
+        to_return(status: 400)
 
       resource.delete.should eq(false)
     end
@@ -185,14 +216,14 @@ describe Shutl::Rest::RestResource do
 
     it 'should return true if the request succeeds' do
       stub_request(:put, 'http://host/test_rest_resources/value').
-         to_return(status: 204)
+        to_return(status: 204)
 
       resource.save.should eq(true)
     end
 
     it 'should return false if the request fails' do
       stub_request(:put, 'http://host/test_rest_resources/value').
-         to_return(status: 400)
+        to_return(status: 400)
 
       resource.save.should eq(false)
     end
@@ -200,7 +231,7 @@ describe Shutl::Rest::RestResource do
     it 'should post in the body the json serialized resource' do
       resource.stub(:to_json).and_return('JSON')
       request = stub_request(:put, 'http://host/test_rest_resources/value').
-                        with(:body => 'JSON')
+        with(:body => 'JSON')
 
       resource.save
 
@@ -210,7 +241,7 @@ describe Shutl::Rest::RestResource do
 
     it 'should raise an error if the update is called with the ! and it fails' do
       stub_request(:put, 'http://host/test_rest_resources/value').
-         to_return(status: 400)
+        to_return(status: 400)
 
       lambda { resource.save! }.should raise_error(Shutl::RemoteError)
     end
@@ -219,7 +250,7 @@ describe Shutl::Rest::RestResource do
   describe '#update!' do
     it 'should post the new json representation' do
       request = stub_request(:put, "http://host/test_rest_resources/a").
-                        with(:body => '{"test_rest_resource":{"a":"a","b":"b"}}')
+        with(:body => '{"test_rest_resource":{"a":"a","b":"b"}}')
       test_resource = TestRestResource.new
 
       test_resource.update!(a: 'a', b: 'b')
