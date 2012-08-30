@@ -2,6 +2,7 @@ require 'httparty'
 require 'active_support/core_ext/string'
 require 'active_support/inflector'
 require 'json'
+require 'uri'
 
 module Shutl
   module Rest
@@ -87,6 +88,7 @@ module Shutl
         def generate_url(url_pattern, args, params = {})
           url = url_pattern.dup
           args.each { |key,value| url.gsub!(":#{key}", value.to_s) }
+          url = URI.escape url
           unless params.empty?
             url += '?'
             params.each { |key, value| url += "#{key}=#{value}&" }

@@ -52,6 +52,15 @@ describe Shutl::Rest::RestResource do
       end
     end
 
+    it 'should encode the url to support spaces' do
+      request = stub_request(:get, 'http://host/test_rest_resources/new%20resource').
+        to_return(:status => 200, :body => '{"test_rest_resource": {}}', :headers => {})
+
+      TestRestResource.find('new resource')
+
+      request.should have_been_requested
+    end
+
     context 'with url arguments' do
       before do
         @request = stub_request(:get, 'http://host/test_rest_resources/a?arg1=val1&arg2=val2').
@@ -171,7 +180,7 @@ describe Shutl::Rest::RestResource do
 
     it 'shoud create a new ressource with the attributes' do
       request = stub_request(:post, "http://host/test_rest_resources").
-        with(:body => '{"test_rest_resource":{"a":"a","b":"b","id":"a"}}')
+         with(:body => '{"test_rest_resource":{"a":"a","id":"a","b":"b"}}')
 
       TestRestResource.create!(a: 'a', b: 'b')
 
