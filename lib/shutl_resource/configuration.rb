@@ -1,18 +1,23 @@
 require 'logger'
 
-module Shutl::Rest
+module ShutlResource
+  def configure(*args, &block)
+    Configuration.configure(*args, &block)
+  end
 
-  class << self
-    def logger
-      @logger ||= Logger.new($stdout)
-    end
+  module Configuration
+    class << self
+      def logger
+        @logger ||= Logger.new($stdout)
+      end
 
-    def configure
-      yield self
-    end
+      def configure
+        yield self
+      end
 
-    def logger=(logger)
-      @logger = logger
+      def logger=(logger)
+        @logger = logger
+      end
     end
   end
 end

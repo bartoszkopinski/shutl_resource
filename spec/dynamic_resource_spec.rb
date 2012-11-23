@@ -1,24 +1,19 @@
 require 'spec_helper'
 
-describe Shutl::DynamicResource do
+describe ShutlResource::RestResource do
 
   class TestResource
-    include Shutl::DynamicResource
+    include ShutlResource::RestResource
   end
 
   class TestOverride
-    include Shutl::DynamicResource
+    include ShutlResource::RestResource
     resource_name 'a_other_prefix'
   end
 
   let(:resource) { TestResource.new({ a: 'a', b: 'b' }) }
 
   describe '#initalize' do
-
-    it 'should create a instance variable for the entries in the hash' do
-      resource.instance_variables.should =~ [ :@a, :@b ]
-    end
-
     it 'should assign the instance variable value for the entries in the hash' do
       resource.instance_variable_get(:@a).should == 'a'
       resource.instance_variable_get(:@b).should == 'b'
@@ -44,7 +39,7 @@ describe Shutl::DynamicResource do
     it 'should serialize in json based on the instance variables' do
       json = resource.to_json
 
-      JSON.parse(json, symbolize_names: true).should == { test_resource: { a: 'a', b: 'b' } } 
+      JSON.parse(json, symbolize_names: true).should == { test_resource: { a: 'a', b: 'b' } }
     end
 
     it 'should be able to overribe the prefix' do
@@ -55,10 +50,10 @@ describe Shutl::DynamicResource do
     end
   end
 
-  describe 'udpate_attributes!' do
+  describe 'udpate_attributes' do
 
     it 'should replace the attributes' do
-      resource.update_attributes!(a: 'c')
+      resource.update_attributes(a: 'c')
 
       resource.instance_variable_get(:@a).should == 'c'
 

@@ -7,6 +7,6 @@ class NoLogger
   def fatal(message) ; end
 end
 
-Shutl::Rest.configure do |config|
+ShutlResource.configure do |config|
   config.logger = NoLogger.new
 end

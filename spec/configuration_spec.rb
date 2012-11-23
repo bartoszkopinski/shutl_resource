@@ -1,18 +1,17 @@
 require 'spec_helper'
 
-describe Shutl::Rest do
-
+describe ShutlResource do
   describe '#configure' do
-    let(:logger) { Shutl::Rest.logger }
+    let(:logger) { ShutlResource.logger }
 
     it 'should configure the logger' do
       logger = stub('logger')
 
-      Shutl::Rest.configure do |config|
+      ShutlResource.configure do |config|
         config.logger = logger
       end
 
-      Shutl::Rest.logger.should == logger
+      ShutlResource.logger.should == logger
     end
   end
 end
