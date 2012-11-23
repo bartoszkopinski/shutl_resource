@@ -23,7 +23,7 @@ e.g. the following header is attached to requests
 Authorization: Bearer some/big/long/base64/thing/goes/here==
 `
 
-`
+```
   200..399 no problem
   299      ShutlResource::NoQuotesGenerated
   400      ShutlResource::BadRequest
@@ -34,7 +34,7 @@ Authorization: Bearer some/big/long/base64/thing/goes/here==
   410      ShutlResource::ResourceGone
   422      ShutlResource::ServerError
   500      ShutlResource::ServiceUnavailable
-`
+```
 
 ## Installation
 
