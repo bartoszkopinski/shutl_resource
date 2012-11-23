@@ -82,7 +82,8 @@ describe ShutlResource::RestResource do
 
     it 'should encode the url to support spaces' do
       request = stub_request(:get, 'http://host/test_rest_resources/new%20resource').
-        to_return(:status => 200, :body => '{"test_rest_resource": {}}', :headers => {})
+        to_return(:status => 200, :body => '{"test_rest_resource": {}}',
+                  :headers => headers)
 
       TestRestResource.find('new resource')
 
@@ -276,7 +277,8 @@ describe ShutlResource::RestResource do
   describe '#update!' do
     it 'should post the new json representation' do
       request = stub_request(:put, "http://host/test_rest_resources/a").
-        with(:body => '{"test_rest_resource":{"a":"a","b":"b","id":"a"}}')
+        with(:body => '{"test_rest_resource":{"a":"a","id":"a","b":"b"}}',
+             headers: headers)
       test_resource = TestRestResource.new
 
       test_resource.update!(a: 'a', b: 'b')
