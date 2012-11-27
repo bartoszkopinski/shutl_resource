@@ -1,6 +1,6 @@
-require './lib/shutl_resource/configuration'
-require './lib/shutl_resource/rest_resource'
-require './lib/shutl_resource/rest_resource_class_methods'
+require 'shutl_resource/configuration'
+require 'shutl_resource/rest_resource'
+require 'shutl_resource/rest_resource_class_methods'
 
 module ShutlResource
   class ShutlResource::Error < ::IOError
