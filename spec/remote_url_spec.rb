@@ -121,6 +121,15 @@ describe ShutlResource::RestResource do
         NestedResource.destroy(parent_id: 10, id: 2)
 
         request.should have_been_requested
+
+        request = stub_request(:delete, 'http://host/nested/10/resources/2').
+          to_return(body: '{"nested_resource": {}}',
+                    headers: {"Content-Type" => "application/json"})
+
+        resource.destroy auth: 'TOKEN'
+
+        request.should have_been_requested
+
       end
 
     end
