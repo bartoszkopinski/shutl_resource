@@ -14,6 +14,56 @@ the request is fine, but we couldn't generate any quotes. It doesn't feel
 like a 4xx or a 5xx, but not quite like a 2xx either. Comments/thoughts
 more than welcome.
 
+#Config
+
+`config/initializers/shutl_resource.rb`
+
+```ruby
+Shutl::Resource.configure do |c|
+  c.logger = Rails.logger
+end
+```
+
+```ruby
+class ApplicationController
+  include ShutlResource::ApplicationControllerMethods
+end
+```
+
+#Usage
+
+```ruby
+#app/resources/spider_cow.rb
+class SpiderCow
+  include ShutlResource::RestResource
+  base_uri "http://localhost:3001"
+end
+
+#app/controllers/spider_cows_controller.rb
+class SpiderCowsController < ShutlResource::BackendResourcesController
+end
+
+#/app/converters/boolean_converter.rb
+module BooleanConverter
+  extend self
+
+  def to_front_end b; b           end
+  def to_back_end  b; b == 'true' end
+end
+
+#/app/converters/spider_cow_converter.rb
+module SpiderCowConverter
+  extend ShutlResource::Converter
+
+  convert :enabled,
+    with: BooleanConverter,
+    only: :to_back_end
+end
+
+```
+
+
+
 # OAuth2
 It uses OAuth2 Bearer tokens for API calls.
 
@@ -38,23 +88,9 @@ Authorization: Bearer some/big/long/base64/thing/goes/here==
 
 ## Installation
 
-Add this line to your application's Gemfile:
+Add this line to your rails app's Gemfile:
 
     gem 'shutl_resource'
-
-
-
-And then execute:
-
-```
-bundle
-```
-
-Or install it yourself as:
-
-```
-gem install shutl_resource
-```
 
 
 ## Contributing
