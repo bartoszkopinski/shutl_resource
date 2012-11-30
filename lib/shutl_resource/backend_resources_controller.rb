@@ -1,3 +1,4 @@
+
 class BackendResourcesController < ApplicationController
   respond_to :json
   before_filter :set_access_token

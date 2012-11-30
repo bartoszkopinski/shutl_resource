@@ -3,19 +3,24 @@ require 'shutl_resource/rest_resource'
 require 'shutl_resource/rest_resource_class_methods'
 require 'shutl_resource/converter'
 require 'shutl_resource/no_converter'
+
+require 'action_controller'
+class ApplicationController < ActionController::Base; end
+
+class ShutlResource::Error < ::IOError
+  attr_reader :response
+
+  def initialize message, http_response
+    @response = http_response
+
+    super message #it really is rather spot on, why thanks for saying, kind sir.
+  end
+end
+
+
 require 'shutl_resource/backend_resources_controller'
 
 module ShutlResource
-  class ShutlResource::Error < ::IOError
-    attr_reader :response
-
-    def initialize message, http_response
-      @response = http_response
-
-      super message #it really is rather spot on, why thanks for saying, kind sir.
-    end
-  end
-
   # This NoQuotesGenerated is shutl specific corresponding to HTTP status 299.
   # We had a good think about what the correct HTTP code is for the case that
   # the request is fine, but we couldn't generate any quotes. It doesn't feel
