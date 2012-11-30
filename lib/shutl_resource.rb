@@ -1,6 +1,9 @@
 require 'shutl_resource/configuration'
 require 'shutl_resource/rest_resource'
 require 'shutl_resource/rest_resource_class_methods'
+require 'shutl_resource/converter'
+require 'shutl_resource/no_converter'
+require 'shutl_resource/backend_resources_controller'
 
 module ShutlResource
   class ShutlResource::Error < ::IOError
