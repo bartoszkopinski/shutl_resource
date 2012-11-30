@@ -1,20 +1,13 @@
 require 'shutl_resource/configuration'
 require 'shutl_resource/rest_resource'
 require 'shutl_resource/rest_resource_class_methods'
+require 'shutl_resource/access_token_request'
+require 'shutl_resource/rest_resource_class_methods'
 require 'shutl_resource/converter'
 require 'shutl_resource/no_converter'
-
-module ShutlResource::ApplicationControllerMethods
-  def token
-    session[:token]
-  end
-
-  def set_access_token
-    session[:token] = Rails.cache.fetch :access_token, expires_in: 5.minutes do
-      AccessTokenRequest.new.access_token
-    end
-  end
-end
+require 'shutl_resource/engine'
+require 'shutl_resource/application_controller_methods'
+require 'rack/oauth2'
 
 class ShutlResource::Error < ::IOError
   attr_reader :response
@@ -25,9 +18,6 @@ class ShutlResource::Error < ::IOError
     super message #it really is rather spot on, why thanks for saying, kind sir.
   end
 end
-
-
-require 'shutl_resource/backend_resources_controller'
 
 module ShutlResource
   # This NoQuotesGenerated is shutl specific corresponding to HTTP status 299.
