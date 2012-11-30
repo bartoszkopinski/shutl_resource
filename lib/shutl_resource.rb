@@ -4,8 +4,17 @@ require 'shutl_resource/rest_resource_class_methods'
 require 'shutl_resource/converter'
 require 'shutl_resource/no_converter'
 
-require 'action_controller'
-class ApplicationController < ActionController::Base; end
+module ShutlResource::ApplicationControllerMethods
+  def token
+    session[:token]
+  end
+
+  def set_access_token
+    session[:token] = Rails.cache.fetch :access_token, expires_in: 5.minutes do
+      AccessTokenRequest.new.access_token
+    end
+  end
+end
 
 class ShutlResource::Error < ::IOError
   attr_reader :response
