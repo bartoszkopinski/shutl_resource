@@ -1,17 +1,10 @@
 module ShutlResource
   class BackendResourcesController < ApplicationController
     respond_to :json
-    before_filter :set_access_token
+    before_filter :request_access_token
     before_filter :load_resource, only: [:show]
 
     rescue_from ShutlResource::Error do |e|
-      # Temporarily, until we implement three legged OAuth.
-      # To avoid need to restart the server on QA environment when we want to
-      # regenerate token.
-      if e.is_a? ShutlResource::UnauthorizedAccess
-        Rails.cache.delete :access_token
-      end
-
       case e.response.content_type
       when "text/html"
         response_hash = { debug_info: e.response.body.to_json}
@@ -21,7 +14,7 @@ module ShutlResource
           response_hash = e.response.parsed_response
         rescue
           debug_info = <<-eof
-        Failed to parse JSON response from quote service:
+          Failed to parse JSON response from quote service:
 
           #{e.message}
 
@@ -40,15 +33,17 @@ module ShutlResource
     end
 
     def index
-      instance_variable_set(
-        pluralized_instance_variable_name,
-        resource_klass.all(id_params.merge auth: token))
+      authenticated_request do
+        instance_variable_set(
+          pluralized_instance_variable_name,
+          resource_klass.all(id_params.merge auth: access_token))
+      end
 
-        response_collection = pluralized_instance_variable.map do |o|
-          attributes_to_front_end o.attributes
-        end
+      response_collection = pluralized_instance_variable.map do |o|
+        attributes_to_front_end o.attributes
+      end
 
-        render json: response_collection
+      render json: response_collection
     end
 
     def new
@@ -57,7 +52,9 @@ module ShutlResource
     end
 
     def create
-      self.instance_variable= resource_klass.create id_params.merge(attributes_from_params), auth: token
+      authenticated_request do
+        self.instance_variable= resource_klass.create id_params.merge(attributes_from_params), auth: access_token
+      end
 
       render status: instance_variable.status, json: instance_variable.parsed
     end
@@ -67,13 +64,17 @@ module ShutlResource
     end
 
     def update
-      resource_klass.update id_params.merge(attributes_from_params), auth: token
+      authenticated_request do
+        resource_klass.update id_params.merge(attributes_from_params), auth: access_token
+      end
 
       render nothing: true, status: 204
     end
 
     def destroy
-      resource_klass.destroy(id_params.merge(id: params[:id]), auth: token)
+      authenticated_request do
+        resource_klass.destroy(id_params.merge(id: params[:id]), auth: access_token)
+      end
 
       render nothing: true, status: 204
     end
@@ -92,7 +93,9 @@ module ShutlResource
     end
 
     def load_resource
-      self.instance_variable = resource_klass.find(id_params, auth: token)
+      authenticated_request do
+        self.instance_variable = resource_klass.find(id_params, auth: access_token)
+      end
 
       render nothing: true, status: 404 if instance_variable.nil?
     end

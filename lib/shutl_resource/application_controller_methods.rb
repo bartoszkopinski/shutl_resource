@@ -1,13 +1,22 @@
 module ShutlResource::ApplicationControllerMethods
-  def token
-    session[:token]
+  def request_access_token
+    return if session[:access_token]
+
+    access_token_response = AccessTokenRequest.new.access_token!
+    session[:access_token] = access_token_response.access_token
   end
 
-  def set_access_token
-    session[:token] = Rails.cache.fetch :access_token, expires_in: 5.minutes do
-      AccessTokenRequest.new.access_token
+  def access_token
+    session[:access_token]
+  end
+
+  def authenticated_request &blk
+    begin
+      yield
+    rescue ShutlResource::UnauthorizedAccess => e
+      session[:access_token] = nil
+      request_access_token
+      yield
     end
   end
 end
-
-
