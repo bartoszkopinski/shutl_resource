@@ -18,6 +18,7 @@ Gem::Specification.new do |gem|
   gem.add_dependency 'httparty', '~> 0.8.3'
   gem.add_dependency 'activesupport', '~> 3.2.3'
   gem.add_dependency 'activemodel', '~> 3.2.3'
+  gem.add_dependency 'railties', '~> 3.2.8'
 
   gem.add_dependency 'rack-oauth2'
 
