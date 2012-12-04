@@ -1,3 +1,4 @@
+require 'rails/engine'
 require 'shutl_resource/configuration'
 require 'shutl_resource/rest_resource'
 require 'shutl_resource/rest_resource_class_methods'
