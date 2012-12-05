@@ -1,23 +1,23 @@
 class AccessTokenRequest
-  attr_reader :access_token
-
   def initialize
-    client = Rack::OAuth2::Client.new(
-      identifier: Shutl.client_id,
-      secret:     Shutl.client_secret,
+    @client = Rack::OAuth2::Client.new(
+      identifier: Shutl.authentication_service[:client_id],
+      secret:     Shutl.authentication_service[:client_secret],
       host:       uri.host,
       port:       uri.port,
       scheme:     uri.scheme
     )
+  end
 
-    @access_token = Shutl.retry_connection "Authentication Service Error" do
-      client.access_token!.access_token
+  def access_token!
+    Shutl.retry_connection "Authentication Service Error" do
+      @client.access_token!
     end
   end
 
   private
 
   def uri
-    @uri ||= URI Shutl.authentication_service_url
+    @uri ||= URI Shutl.authentication_service[:url]
   end
 end
