@@ -1,11 +1,12 @@
 class AccessTokenRequest
   def initialize
     @client = Rack::OAuth2::Client.new(
-      identifier: Shutl.authentication_service[:client_id],
-      secret:     Shutl.authentication_service[:client_secret],
-      host:       uri.host,
-      port:       uri.port,
-      scheme:     uri.scheme
+      identifier:     Shutl.authentication_service[:client_id],
+      secret:         Shutl.authentication_service[:client_secret],
+      host:           uri.host,
+      token_endpoint: '/token',
+      port:           uri.port,
+      scheme:         uri.scheme
     )
   end
 
