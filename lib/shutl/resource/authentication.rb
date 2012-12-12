@@ -1,4 +1,4 @@
-module Shutl::Resource::ApplicationControllerMethods
+module Shutl::Resource::Authentication
   def request_access_token
     return if session[:access_token]
 

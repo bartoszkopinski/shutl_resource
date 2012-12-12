@@ -11,7 +11,7 @@ require 'shutl/resource/rest_class_methods'
 require 'shutl/resource/converter'
 require 'shutl/resource/no_converter'
 require 'shutl/resource/engine'
-require 'shutl/resource/application_controller_methods'
+require 'shutl/resource/authentication'
 require 'shutl/resource/errors'
 require 'rack/oauth2'
 
