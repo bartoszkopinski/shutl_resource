@@ -1,5 +1,3 @@
-require 'rails/engine'
-
 module Shutl
 end
 
