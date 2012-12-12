@@ -16,14 +16,12 @@ Gem::Specification.new do |gem|
   gem.version       = Shutl::Resource::VERSION
 
   gem.add_dependency 'httparty', '~> 0.8.3'
+  gem.add_dependency 'shutl_auth'
   gem.add_dependency 'activesupport', '~> 3.2.3'
   gem.add_dependency 'activemodel', '~> 3.2.3'
   gem.add_dependency 'railties', '~> 3.2.8'
 
-  gem.add_dependency 'rack-oauth2'
-
   gem.add_development_dependency 'rspec', '~> 2.11.0'
   gem.add_development_dependency 'debugger'
   gem.add_development_dependency 'webmock', '~> 1.8.7'
-
 end
