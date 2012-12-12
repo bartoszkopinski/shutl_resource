@@ -1,3 +1,3 @@
-module ShutlResource
+module Shutl::Resource
   VERSION = '0.6.3'
 end

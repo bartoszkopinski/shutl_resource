@@ -1,4 +1,4 @@
-module ShutlResource::NoConverter
+module Shutl::Resource::NoConverter
   extend self
 
   def to_front_end value; value end

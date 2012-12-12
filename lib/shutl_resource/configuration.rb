@@ -1,6 +1,6 @@
 require 'logger'
 
-module ShutlResource
+module Shutl::Resource
   def configure(*args, &block)
     Configuration.configure(*args, &block)
   end

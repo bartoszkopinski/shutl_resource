@@ -1,4 +1,4 @@
-module ShutlResource::Converter
+module Shutl::Resource::Converter
   def convert *attr_names, options
     @converters ||= {}
 
@@ -36,7 +36,7 @@ module ShutlResource::Converter
     begin
       "#{resource_class}Converter".constantize
     rescue NameError => e
-      ShutlResource::NoConverter
+      Shutl::Resource::NoConverter
     end
   end
 end

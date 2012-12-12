@@ -1,4 +1,4 @@
-module ShutlResource::ApplicationControllerMethods
+module Shutl::Resource::ApplicationControllerMethods
   def request_access_token
     return if session[:access_token]
 
@@ -13,7 +13,7 @@ module ShutlResource::ApplicationControllerMethods
   def authenticated_request &blk
     begin
       yield
-    rescue ShutlResource::UnauthorizedAccess => e
+    rescue Shutl::UnauthorizedAccess => e
       session[:access_token] = nil
       request_access_token
       yield
