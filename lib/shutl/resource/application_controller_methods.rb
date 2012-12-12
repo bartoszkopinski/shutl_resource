@@ -2,7 +2,7 @@ module Shutl::Resource::ApplicationControllerMethods
   def request_access_token
     return if session[:access_token]
 
-    access_token_response = AccessTokenRequest.new.access_token!
+    access_token_response = Shutl::Resource::AccessTokenRequest.new.access_token!
     session[:access_token] = access_token_response.access_token
   end
 
