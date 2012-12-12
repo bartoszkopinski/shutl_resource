@@ -1,43 +1,21 @@
 require 'rails/engine'
-require 'shutl_resource/configuration'
-require 'shutl_resource/rest_resource'
-require 'shutl_resource/rest_resource_class_methods'
-require 'shutl_resource/access_token_request'
-require 'shutl_resource/rest_resource_class_methods'
-require 'shutl_resource/converter'
-require 'shutl_resource/no_converter'
-require 'shutl_resource/engine'
-require 'shutl_resource/application_controller_methods'
-require 'rack/oauth2'
 
-class Shutl::Resource::Error < ::IOError
-  attr_reader :response
-
-  def initialize message, http_response
-    @response = http_response
-
-    super message #it really is rather spot on, why thanks for saying, kind sir.
-  end
+module Shutl
 end
 
+require 'shutl/resource/configuration'
+require 'shutl/resource/rest'
+require 'shutl/resource/rest_class_methods'
+require 'shutl/resource/access_token_request'
+require 'shutl/resource/rest_class_methods'
+require 'shutl/resource/converter'
+require 'shutl/resource/no_converter'
+require 'shutl/resource/engine'
+require 'shutl/resource/application_controller_methods'
+require 'shutl/resource/errors'
+require 'rack/oauth2'
+
 module Shutl::Resource
-  # This NoQuotesGenerated is shutl specific corresponding to HTTP status 299.
-  # We had a good think about what the correct HTTP code is for the case that
-  # the request is fine, but we couldn't generate any quotes. It doesn't feel
-  # like a 4xx or a 5xx, but not quite like a 2xx either. Comments/thoughts
-  # more than welcome.
-  Shutl::NoQuotesGenerated  = Class.new Shutl::Resource::Error
-
-  Shutl::BadRequest         = Class.new Shutl::Resource::Error
-  Shutl::UnauthorizedAccess = Class.new Shutl::Resource::Error
-  Shutl::ForbiddenAccess    = Class.new Shutl::Resource::Error
-  Shutl::ResourceNotFound   = Class.new Shutl::Resource::Error
-  Shutl::ResourceConflict   = Class.new Shutl::Resource::Error
-  Shutl::ResourceGone       = Class.new Shutl::Resource::Error
-  Shutl::ResourceInvalid    = Class.new Shutl::Resource::Error
-  Shutl::ServerError        = Class.new Shutl::Resource::Error
-  Shutl::ServiceUnavailable = Class.new Shutl::Resource::Error
-
   extend self
 
   delegate :logger, :logger=, to: Configuration

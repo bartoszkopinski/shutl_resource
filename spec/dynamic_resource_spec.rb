@@ -1,13 +1,13 @@
 require 'spec_helper'
 
-describe ShutlResource::RestResource do
+describe Shutl::Resource::Rest do
 
   class TestResource
-    include ShutlResource::RestResource
+    include Shutl::Resource::Rest
   end
 
   class TestOverride
-    include ShutlResource::RestResource
+    include Shutl::Resource::Rest
     resource_name 'a_other_prefix'
   end
 

@@ -1,4 +1,4 @@
-# ShutlResource
+# Shutl::Resource
 
 Yep this is ActiveResource-esque.
 
@@ -26,7 +26,7 @@ end
 
 ```ruby
 class ApplicationController
-  include ShutlResource::ApplicationControllerMethods
+  include Shutl::Resource::ApplicationControllerMethods
 end
 ```
 
@@ -35,12 +35,12 @@ end
 ```ruby
 #app/resources/spider_cow.rb
 class SpiderCow
-  include ShutlResource::RestResource
+  include Shutl::Resource::Rest
   base_uri "http://localhost:3001"
 end
 
 #app/controllers/spider_cows_controller.rb
-class SpiderCowsController < ShutlResource::BackendResourcesController
+class SpiderCowsController < Shutl::Resource::BackendResourcesController
 end
 
 #/app/converters/boolean_converter.rb
@@ -53,7 +53,7 @@ end
 
 #/app/converters/spider_cow_converter.rb
 module SpiderCowConverter
-  extend ShutlResource::Converter
+  extend Shutl::Resource::Converter
 
   convert :enabled,
     with: BooleanConverter,
@@ -75,15 +75,15 @@ Authorization: Bearer some/big/long/base64/thing/goes/here==
 
 ```
   200..399 no problem
-  299      ShutlResource::NoQuotesGenerated
-  400      ShutlResource::BadRequest
-  401      ShutlResource::UnauthorizedAccess
-  403      ShutlResource::ForbiddenAccess
-  404      ShutlResource::ResourceNotFound
-  409      ShutlResource::ResourceConflict
-  410      ShutlResource::ResourceGone
-  422      ShutlResource::ServerError
-  500      ShutlResource::ServiceUnavailable
+  299      Shutl::NoQuotesGenerated
+  400      Shutl::BadRequest
+  401      Shutl::UnauthorizedAccess
+  403      Shutl::ForbiddenAccess
+  404      Shutl::ResourceNotFound
+  409      Shutl::ResourceConflict
+  410      Shutl::ResourceGone
+  422      Shutl::ServerError
+  500      Shutl::ServiceUnavailable
 ```
 
 ## Installation

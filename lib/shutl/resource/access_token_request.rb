@@ -1,24 +1,26 @@
-class AccessTokenRequest
-  def initialize
-    @client = Rack::OAuth2::Client.new(
-      identifier:     Shutl.authentication_service[:client_id],
-      secret:         Shutl.authentication_service[:client_secret],
-      host:           uri.host,
-      token_endpoint: '/token',
-      port:           uri.port,
-      scheme:         uri.scheme
-    )
-  end
-
-  def access_token!
-    Shutl.retry_connection "Authentication Service Error" do
-      @client.access_token!
+module Shutl::Resource
+  class AccessTokenRequest
+    def initialize
+      @client = Rack::OAuth2::Client.new(
+        identifier: Shutl.authentication_service[:client_id],
+        secret:     Shutl.authentication_service[:client_secret],
+        token_endpoint: '/token',
+        host:       uri.host,
+        port:       uri.port,
+        scheme:     uri.scheme
+      )
     end
-  end
 
-  private
+    def access_token!
+      Shutl.retry_connection "Authentication Service Error" do
+        @client.access_token!
+      end
+    end
 
-  def uri
-    @uri ||= URI Shutl.authentication_service[:url]
+    private
+
+    def uri
+      @uri ||= URI Shutl.authentication_service[:url]
+    end
   end
 end

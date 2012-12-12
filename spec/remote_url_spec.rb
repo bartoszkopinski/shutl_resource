@@ -1,20 +1,20 @@
 require 'spec_helper'
 
-describe ShutlResource::RestResource do
+describe Shutl::Resource::Rest do
   let(:headers) do
     {'Accept'=>'application/json', 'Authorization'=>'Bearer', 'Content-Type'=>'application/json'}
   end
 
 
   class OverrideUrlResource
-    include ShutlResource::RestResource
+    include Shutl::Resource::Rest
     collection_url '/api/resources'
     resource_url '/api/resources/:name'
   end
 
   describe '#remote_collection_url' do
     it 'should be based on the resource name by default' do
-      TestRestResource.remote_collection_url.should == '/test_rest_resources'
+      TestRest.remote_collection_url.should == '/test_rests'
     end
 
     it 'should use the override if defined' do
@@ -24,7 +24,7 @@ describe ShutlResource::RestResource do
 
   describe '#remote_resource_url' do
     it 'should be base on the resource name and the resource id name by default' do
-      TestRestResource.remote_resource_url.should == '/test_rest_resources/:a'
+      TestRest.remote_resource_url.should == '/test_rests/:a'
     end
 
     it 'should use the override if defined' do
@@ -34,7 +34,7 @@ describe ShutlResource::RestResource do
 
   context 'nested resource' do
     class NestedResource
-      include ShutlResource::RestResource
+      include Shutl::Resource::Rest
       base_uri 'http://host'
       collection_url '/nested/:parent_id/resources'
       resource_url '/nested/:parent_id/resources/:id'

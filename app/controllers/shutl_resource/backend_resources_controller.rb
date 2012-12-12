@@ -1,10 +1,10 @@
-module ShutlResource
+module Shutl::Resource
   class BackendResourcesController < ApplicationController
     respond_to :json
     before_filter :request_access_token
     before_filter :load_resource, only: [:show]
 
-    rescue_from ShutlResource::Error do |e|
+    rescue_from Shutl::Resource::Error do |e|
       case e.response.content_type
       when "text/html"
         response_hash = { debug_info: e.response.body.to_json}
@@ -151,7 +151,7 @@ module ShutlResource
     end
 
     def converter_class
-      ShutlResource::Converter.class_for resource_klass
+      Shutl::Resource::Converter.class_for resource_klass
     end
 
     def attributes_to_front_end attrs
