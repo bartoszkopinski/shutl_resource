@@ -14,65 +14,16 @@ the request is fine, but we couldn't generate any quotes. It doesn't feel
 like a 4xx or a 5xx, but not quite like a 2xx either. Comments/thoughts
 more than welcome.
 
-#Config
-
-`config/initializers/shutl_resource.rb`
-
-```ruby
-Shutl::Resource.configure do |c|
-  c.logger = Rails.logger
-end
-```
-
-```ruby
-class ApplicationController
-  include Shutl::Resource::ApplicationControllerMethods
-end
-```
-
 #Usage
 
 ```ruby
-#app/resources/spider_cow.rb
-class SpiderCow
+#app/models/shutl/quote.rb
+class Shutl::QuoteCollection
   include Shutl::Resource::Rest
-  base_uri "http://localhost:3001"
+  base_uri "http://shutl-api-url"
 end
 
-#app/controllers/spider_cows_controller.rb
-class SpiderCowsController < Shutl::Resource::BackendResourcesController
-end
-
-#/app/converters/boolean_converter.rb
-module BooleanConverter
-  extend self
-
-  def to_front_end b; b           end
-  def to_back_end  b; b == 'true' end
-end
-
-#/app/converters/spider_cow_converter.rb
-module SpiderCowConverter
-  extend Shutl::Resource::Converter
-
-  convert :enabled,
-    with: BooleanConverter,
-    only: :to_back_end
-end
-
-```
-
-
-
-# OAuth2
-It uses OAuth2 Bearer tokens for API calls.
-
-e.g. the following header is attached to requests
-
-`
-Authorization: Bearer some/big/long/base64/thing/goes/here==
-`
-
+The following exceptions may be raised
 ```
   200..399 no problem
   299      Shutl::NoQuotesGenerated
@@ -82,7 +33,7 @@ Authorization: Bearer some/big/long/base64/thing/goes/here==
   404      Shutl::ResourceNotFound
   409      Shutl::ResourceConflict
   410      Shutl::ResourceGone
-  422      Shutl::ServerError
+  422      Shutl::ResourceInvalid
   500      Shutl::ServiceUnavailable
 ```
 
@@ -91,6 +42,16 @@ Authorization: Bearer some/big/long/base64/thing/goes/here==
 Add this line to your rails app's Gemfile:
 
     gem 'shutl_resource'
+
+# OAuth2
+It uses OAuth2 Bearer tokens for API calls using the shutl_auth gem
+
+e.g. the following header is attached to requests
+
+`
+Authorization: Bearer some/big/long/base64/thing/goes/here==
+`
+
 
 
 ## Contributing
