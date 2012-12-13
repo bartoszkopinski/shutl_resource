@@ -51,7 +51,7 @@ It uses OAuth2 Bearer tokens for API calls using the shutl_auth gem
 e.g. the following header is attached to requests
 
 `
-Authorization: Bearer some/big/long/base64/thing/goes/here==
+Authorization: Bearer some-big-long-urlsafe-base64-thing-goes-here
 `
 
 
