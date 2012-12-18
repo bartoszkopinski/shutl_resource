@@ -24,7 +24,6 @@ class Shutl::QuoteCollection
 end
 
 The following exceptions may be raised
-```
   200..399 no problem
   299      Shutl::NoQuotesGenerated
   400      Shutl::BadRequest
