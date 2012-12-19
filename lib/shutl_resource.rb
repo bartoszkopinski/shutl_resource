@@ -10,7 +10,7 @@ require 'shutl_resource/engine'
 require 'shutl_resource/application_controller_methods'
 require 'rack/oauth2'
 
-class ShutlResource::Error < ::IOError
+class Shutl::Resource::Error < ::IOError
   attr_reader :response
 
   def initialize message, http_response
@@ -20,23 +20,23 @@ class ShutlResource::Error < ::IOError
   end
 end
 
-module ShutlResource
+module Shutl::Resource
   # This NoQuotesGenerated is shutl specific corresponding to HTTP status 299.
   # We had a good think about what the correct HTTP code is for the case that
   # the request is fine, but we couldn't generate any quotes. It doesn't feel
   # like a 4xx or a 5xx, but not quite like a 2xx either. Comments/thoughts
   # more than welcome.
-  ShutlResource::NoQuotesGenerated  = Class.new ShutlResource::Error
+  Shutl::NoQuotesGenerated  = Class.new Shutl::Resource::Error
 
-  ShutlResource::BadRequest         = Class.new ShutlResource::Error
-  ShutlResource::UnauthorizedAccess = Class.new ShutlResource::Error
-  ShutlResource::ForbiddenAccess    = Class.new ShutlResource::Error
-  ShutlResource::ResourceNotFound   = Class.new ShutlResource::Error
-  ShutlResource::ResourceConflict   = Class.new ShutlResource::Error
-  ShutlResource::ResourceGone       = Class.new ShutlResource::Error
-  ShutlResource::ResourceInvalid    = Class.new ShutlResource::Error
-  ShutlResource::ServerError        = Class.new ShutlResource::Error
-  ShutlResource::ServiceUnavailable = Class.new ShutlResource::Error
+  Shutl::BadRequest         = Class.new Shutl::Resource::Error
+  Shutl::UnauthorizedAccess = Class.new Shutl::Resource::Error
+  Shutl::ForbiddenAccess    = Class.new Shutl::Resource::Error
+  Shutl::ResourceNotFound   = Class.new Shutl::Resource::Error
+  Shutl::ResourceConflict   = Class.new Shutl::Resource::Error
+  Shutl::ResourceGone       = Class.new Shutl::Resource::Error
+  Shutl::ResourceInvalid    = Class.new Shutl::Resource::Error
+  Shutl::ServerError        = Class.new Shutl::Resource::Error
+  Shutl::ServiceUnavailable = Class.new Shutl::Resource::Error
 
   extend self
 

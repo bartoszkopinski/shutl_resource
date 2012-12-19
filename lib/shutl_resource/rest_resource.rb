@@ -6,7 +6,7 @@ require 'json'
 require 'uri'
 require 'active_model'
 
-module ShutlResource
+module Shutl::Resource
   module RestResource
     extend HTTParty
     include ActiveModel::Serialization
@@ -15,7 +15,7 @@ module ShutlResource
 
     def self.included(base)
       base.send :include, HTTParty
-      base.send :extend,  ShutlResource::RestResourceClassMethods
+      base.send :extend,  Shutl::Resource::RestResourceClassMethods
 
       base.send :headers, {
         'Accept'        => 'application/json',

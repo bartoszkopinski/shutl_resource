@@ -1,2 +1,2 @@
-class ShutlResource::Engine < Rails::Engine
+class Shutl::Resource::Engine < Rails::Engine
 end

@@ -1,4 +1,4 @@
-module ShutlResource
+module Shutl::Resource
   module RestResourceClassMethods
     def find(args, params = {})
       unless args.kind_of?(Hash)
@@ -156,20 +156,20 @@ module ShutlResource
     def check_fail response, message
       c = response.code
       failure_klass = case c
-                      when 299 then ShutlResource::NoQuotesGenerated
-                      when 400 then ShutlResource::BadRequest
-                      when 401 then ShutlResource::UnauthorizedAccess
-                      when 403 then ShutlResource::ForbiddenAccess
-                      when 404 then ShutlResource::ResourceNotFound
-                      when 409 then ShutlResource::ResourceConflict
-                      when 410 then ShutlResource::ResourceGone
-                      when 422 then ShutlResource::ResourceInvalid
+                      when 299 then Shutl::NoQuotesGenerated
+                      when 400 then Shutl::BadRequest
+                      when 401 then Shutl::UnauthorizedAccess
+                      when 403 then Shutl::ForbiddenAccess
+                      when 404 then Shutl::ResourceNotFound
+                      when 409 then Shutl::ResourceConflict
+                      when 410 then Shutl::ResourceGone
+                      when 422 then Shutl::ResourceInvalid
                       when 411..499
-                        ShutlResource::BadRequest
-                      when 500 then ShutlResource::ServerError
-                      when 503 then ShutlResource::ServiceUnavailable
+                        Shutl::BadRequest
+                      when 500 then Shutl::ServerError
+                      when 503 then Shutl::ServiceUnavailable
                       when 501..Float::INFINITY
-                        ShutlResource::ServerError
+                        Shutl::ServerError
                       end
 
       raise failure_klass.new message, response if failure_klass
