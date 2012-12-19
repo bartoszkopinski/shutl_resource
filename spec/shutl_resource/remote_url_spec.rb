@@ -1,10 +1,6 @@
 require 'spec_helper'
 
 describe Shutl::Resource::Rest do
-  let(:headers) do
-    {'Accept'=>'application/json', 'Authorization'=>'Bearer', 'Content-Type'=>'application/json'}
-  end
-
 
   class OverrideUrlResource
     include Shutl::Resource::Rest
@@ -45,27 +41,31 @@ describe Shutl::Resource::Rest do
     describe '#all' do
       it 'should query the correct endpoint' do
         request = stub_request(:get, 'http://host/nested/10/resources').
-          to_return(body: '{"nested_resources": []}', headers: headers)
+          to_return(body: '{"nested_resources": []}',
+                    headers: {"Content-Type" => "application/json"}
+                   )
 
-        NestedResource.all(parent_id: 10)
+        NestedResource.all(parent_id: 10, auth: 'TOKEN')
 
         request.should have_been_requested
       end
 
       it 'should add the nested params to the attributes' do
         stub_request(:get, 'http://host/nested/10/resources').
-          to_return(body: '{"nested_resources": [{}, {}]}', headers: headers)
+          to_return(body: '{"nested_resources": [{}, {}]}',
+                    headers: {"Content-Type" => "application/json"})
 
-        resources = NestedResource.all(parent_id: 10)
+        resources = NestedResource.all(parent_id: 10, auth: 'TOKEN')
 
         resources.each { |r| r.parent_id.should == 10 }
       end
 
       it 'should support the params' do
         request = stub_request(:get, 'http://host/nested/10/resources?arg1=val1&arg2=val2').
-          to_return(body: '{"nested_resources": []}', headers: headers)
+          to_return(body: '{"nested_resources": []}',
+                    headers: {"Content-Type" => "application/json"})
 
-        NestedResource.all(parent_id: 10, arg1: 'val1', arg2: 'val2')
+        NestedResource.all(parent_id: 10, arg1: 'val1', arg2: 'val2', auth: 'TOKEN')
 
         request.should have_been_requested
       end
@@ -74,18 +74,20 @@ describe Shutl::Resource::Rest do
     describe '#find' do
       it 'should query the correct endpoint' do
         request = stub_request(:get, 'http://host/nested/10/resources/2').
-          to_return(body: '{"nested_resource": {}}', headers: headers)
+          to_return(body: '{"nested_resource": {}}',
+                    headers: {"Content-Type" => "application/json"})
 
-        NestedResource.find(id: 2, parent_id: 10)
+        NestedResource.find(id: 2, parent_id: 10, auth: 'TOKEN')
 
         request.should have_been_requested
       end
 
       it 'should add the nested params to the attributes' do
         stub_request(:get, 'http://host/nested/10/resources/2').
-          to_return(body: '{"nested_resource": {}}', headers: headers)
+          to_return(body: '{"nested_resource": {}}',
+                    headers: {"Content-Type" => "application/json"})
 
-        resource = NestedResource.find(id: 2, parent_id: 10)
+        resource = NestedResource.find(id: 2, parent_id: 10, auth: 'TOKEN')
 
         resource.parent_id.should == 10
       end
@@ -94,20 +96,27 @@ describe Shutl::Resource::Rest do
     describe 'update' do
       it 'should query the correct endpoint' do
         request = stub_request(:put, 'http://host/nested/10/resources/2').
-          to_return(body: '{"nested_resource": {}}', headers: headers)
+          to_return(body: '{"nested_resource": {}}',
+                    headers: {"Content-Type" => "application/json"})
 
-        resource.save
+        resource.save auth: 'TOKEN'
 
         request.should have_been_requested
       end
     end
 
-    describe '#create' do
+    describe '.create' do
       it 'should query the correct endpoint' do
-        request = stub_request(:post, 'http://host/nested/10/resources').
-          to_return(body: '{"nested_resource": {}}', headers: headers)
+        request =
+          stub_request(:post, 'http://host/nested/10/resources').
 
-        NestedResource.create(parent_id: 10)
+          with(body: '{"nested_resource":{"some_attribute":"1"}}',
+               headers: {"Accept" => "application/json"}).
+
+          to_return(body: '{"nested_resource": {}}',
+                    headers: {"Content-Type" => "application/json"})
+
+        NestedResource.create({parent_id: 10, some_attribute: "1"}, {auth: 'TOKEN'})
 
         request.should have_been_requested
       end
@@ -116,22 +125,12 @@ describe Shutl::Resource::Rest do
     describe '#delete' do
       it 'should query the correct endpoint' do
         request = stub_request(:delete, 'http://host/nested/10/resources/2').
-          to_return(body: '{"nested_resource": {}}', headers: headers)
-
-        NestedResource.destroy(parent_id: 10, id: 2)
-
-        request.should have_been_requested
-      end
-
-      specify do
-        request = stub_request(:delete, 'http://host/nested/10/resources/2').
           to_return(body: '{"nested_resource": {}}',
                     headers: {"Content-Type" => "application/json"})
 
         resource.destroy auth: 'TOKEN'
 
         request.should have_been_requested
-
       end
 
     end

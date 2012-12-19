@@ -1,5 +1,5 @@
 # -*- encoding: utf-8 -*-
-require File.expand_path('../lib/shutl_resource/version', __FILE__)
+require File.expand_path('../lib/shutl/resource/version', __FILE__)
 
 Gem::Specification.new do |gem|
   gem.authors       = ["David Rouchy"]
@@ -13,17 +13,13 @@ Gem::Specification.new do |gem|
   gem.test_files    = gem.files.grep(%r{^(test|spec|features)/})
   gem.name          = "shutl_resource"
   gem.require_paths = ["lib"]
-  gem.version       = ShutlResource::VERSION
+  gem.version       = Shutl::Resource::VERSION
 
   gem.add_dependency 'httparty', '~> 0.8.3'
-  gem.add_dependency 'activesupport', '~> 3.2.3'
-  gem.add_dependency 'activemodel', '~> 3.2.3'
-  gem.add_dependency 'railties', '~> 3.2.8'
-
-  gem.add_dependency 'rack-oauth2'
+  gem.add_dependency 'shutl_auth'
+  gem.add_dependency 'activemodel'
 
   gem.add_development_dependency 'rspec', '~> 2.11.0'
   gem.add_development_dependency 'debugger'
   gem.add_development_dependency 'webmock', '~> 1.8.7'
-
 end
