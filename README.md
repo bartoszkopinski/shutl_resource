@@ -22,6 +22,8 @@ class Shutl::QuoteCollection
   include Shutl::Resource::Rest
   base_uri "http://shutl-api-url"
 end
+```
+
 
 The following exceptions may be raised
 ```
