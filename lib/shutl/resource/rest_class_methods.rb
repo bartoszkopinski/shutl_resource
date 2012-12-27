@@ -50,7 +50,7 @@ module Shutl::Resource
       attributes = instance.attributes rescue instance
 
       response = perform_action instance, :put,
-        {body: {@resource_name => attributes}.to_json}.merge(headers_with_auth options[:auth]),
+        {body: {@resource_name => convert_new_id(attributes)}.to_json}.merge(headers_with_auth options[:auth]),
       "Save failed"
 
       response.success?
@@ -106,6 +106,14 @@ module Shutl::Resource
       @remote_resource_url = url
     end
 
+    def convert_new_id attributes
+      if attributes[:new_id]
+        attributes = attributes.clone.tap {|h| h[:id] = h[:new_id]; h.delete(:new_id)}
+      end
+
+      attributes
+    end
+
     def add_resource_id_to args={}
       args = args.dup.with_indifferent_access
       unless args.has_key? "id"
@@ -116,7 +124,6 @@ module Shutl::Resource
 
     def member_url *args
       attributes = args.first.with_indifferent_access
-
       unless attributes[resource_id_name] ||= attributes[:id]
         raise ArgumentError, "Missing resource id with name: `#{resource_id_name}' for #{self}"
       end

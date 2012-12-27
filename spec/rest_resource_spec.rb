@@ -310,6 +310,20 @@ describe Shutl::Resource::Rest do
 
       request.should have_been_requested
     end
+
+    it 'should convert new_id to id in attributes' do
+      request = stub_request(:put, "http://host/test_rests/a").
+         with(:body => "{\"test_rest\":{\"a\":\"a\",\"id\":\"xxx\",\"b\":\"b\"}}",
+              :headers => headers)
+
+      test_resource = TestRest.new
+
+      test_resource.update!(a: 'a', b: 'b', new_id: 'xxx')
+
+      request.should have_been_requested
+    end
   end
+
+
 
 end
