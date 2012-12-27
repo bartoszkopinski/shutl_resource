@@ -1,6 +1,19 @@
 require 'logger'
 
 module Shutl::Resource
+
+  class << self
+    attr_writer :raise_exceptions_on_validation
+
+    def raise_exceptions_on_validation
+      if @raise_exceptions_on_validation.nil?
+        @raise_exceptions_on_validation = true
+      end
+
+      @raise_exceptions_on_validation
+    end
+  end
+
   def configure(*args, &block)
     Configuration.configure(*args, &block)
   end

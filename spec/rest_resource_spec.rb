@@ -155,7 +155,32 @@ describe Shutl::Resource::Rest do
     end
   end
 
-  describe '#create' do
+  describe '.create' do
+
+    context "With the setting to not raise exceptions" do
+      before do
+        Shutl::Resource.raise_exceptions_on_validation = false
+      end
+
+      after do
+        Shutl::Resource.raise_exceptions_on_validation = true
+      end
+      specify do
+        errors = {"base" => "invalid", "some_field" => "some field is invalid"}
+        body = {"errors" => errors}.to_json
+
+        @request = stub_request(:post, 'http://host/test_rests').
+          to_return(:status => 422, body: body, :headers => headers)
+
+        expect{@instance = TestRest.create}.to_not raise_error Shutl::ResourceInvalid
+
+        @request.should have_been_requested
+        @instance.should_not be_valid
+        @instance.errors.should == errors
+      end
+    end
+
+
     it 'should send a post request to the endpoint' do
       request = stub_post 200
 
@@ -179,7 +204,7 @@ describe Shutl::Resource::Rest do
 
     it 'should post the header content-type: json' do
       request = stub_request(:post, 'http://host/test_rests').
-        with( :headers => headers )
+        with(:body => "{\"test_rest\":{}}", :headers => headers )
 
       TestRest.create
 

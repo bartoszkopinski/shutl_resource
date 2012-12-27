@@ -150,7 +150,15 @@ module Shutl::Resource
     end
 
     def new_object(args={}, response=nil)
-      new add_resource_id_to(args), response
+      instance = new add_resource_id_to(args)
+
+      instance.tap do |i|
+        parsed_response = response.parsed_response
+
+        if errors = (parsed_response and parsed_response["errors"])
+          i.errors = errors
+        end
+      end
     end
 
     def check_fail response, message
@@ -163,7 +171,13 @@ module Shutl::Resource
                       when 404 then Shutl::ResourceNotFound
                       when 409 then Shutl::ResourceConflict
                       when 410 then Shutl::ResourceGone
-                      when 422 then Shutl::ResourceInvalid
+                      when 422
+                        if Shutl::Resource.raise_exceptions_on_validation
+                          Shutl::ResourceInvalid
+                        else
+                          nil #handled as validation failure
+                        end
+
                       when 411..499
                         Shutl::BadRequest
                       when 500 then Shutl::ServerError

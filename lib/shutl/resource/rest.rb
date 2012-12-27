@@ -70,6 +70,12 @@ module Shutl::Resource
       response.code
     end
 
+    attr_accessor :errors
+
+    def valid?
+      errors.blank?
+    end
+
     def resource_id
       instance_variable_get :"@#{self.class.resource_id_name}"
     end
