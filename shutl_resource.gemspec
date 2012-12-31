@@ -1,12 +1,15 @@
 # -*- encoding: utf-8 -*-
 require File.expand_path('../lib/shutl/resource/version', __FILE__)
 
+$platform ||= RUBY_PLATFORM[/java/] || 'ruby'
+
 Gem::Specification.new do |gem|
-  gem.authors       = ["David Rouchy"]
-  gem.email         = ["davidr@shutl.co.uk"]
+  gem.authors       = ["David Rouchy", "Volker Pacher", "Mark Burns"]
+  gem.email         = ["davidr@shutl.co.uk", "volker@shutl.com", "mark@shutl.com"]
   gem.description   = %q{Shutl Rest resource}
   gem.summary       = %q{Manage Shutl Rest resource. Parse/Serialize JSON}
   gem.homepage      = ""
+  gem.platform       = $platform
 
   gem.files         = `git ls-files`.split($\)
   gem.executables   = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
@@ -20,6 +23,8 @@ Gem::Specification.new do |gem|
   gem.add_dependency 'activemodel'
 
   gem.add_development_dependency 'rspec', '~> 2.11.0'
-  gem.add_development_dependency 'debugger'
+  gem.add_development_dependency 'debugger'   if $platform.to_s == 'ruby'
+  gem.add_development_dependency 'ruby-debug' if $platform.to_s == 'java'
+
   gem.add_development_dependency 'webmock', '~> 1.8.7'
 end
