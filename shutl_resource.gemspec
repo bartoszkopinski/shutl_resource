@@ -22,6 +22,7 @@ Gem::Specification.new do |gem|
   gem.add_dependency 'shutl_auth', '0.0.2'
   gem.add_dependency 'activemodel'
 
+  gem.add_development_dependency 'rake'
   gem.add_development_dependency 'rspec', '~> 2.11.0'
   gem.add_development_dependency 'debugger'   if $platform.to_s == 'ruby'
   gem.add_development_dependency 'ruby-debug' if $platform.to_s == 'java'
