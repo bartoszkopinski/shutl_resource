@@ -1,0 +1,97 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: http://localhost:3000/token
+    body:
+      encoding: ASCII-8BIT
+      string: !binary |-
+        Z3JhbnRfdHlwZT1jbGllbnRfY3JlZGVudGlhbHM=
+    headers:
+      Authorization:
+      - Basic UVVPVEVfU0VSVklDRV9DTElFTlRfSUQ6UVVPVEVfU0VSVklDRV9DTElFTlRfU0VDUkVU
+      Content-Type:
+      - application/x-www-form-urlencoded
+  response:
+    status:
+      code: 200
+      message: !binary |-
+        T0sg
+    headers:
+      !binary "Q29udGVudC1UeXBl":
+      - !binary |-
+        YXBwbGljYXRpb24vanNvbg==
+      !binary "Q29udGVudC1MZW5ndGg=":
+      - !binary |-
+        MTUw
+      !binary "Q2FjaGUtQ29udHJvbA==":
+      - !binary |-
+        bm8tc3RvcmU=
+      !binary "UHJhZ21h":
+      - !binary |-
+        bm8tY2FjaGU=
+      !binary "WC1VYS1Db21wYXRpYmxl":
+      - !binary |-
+        SUU9RWRnZQ==
+      !binary "RXRhZw==":
+      - !binary |-
+        IjI0MGExNWE1NjFhMWI0NzMwZDI4ZTFlOGEzZjlkOTllIg==
+      !binary "WC1SZXF1ZXN0LUlk":
+      - !binary |-
+        MjY1YTMwYjRmMjRlOGMzZmRlZTVhOTA1OGJjZGYxYjA=
+      !binary "WC1SdW50aW1l":
+      - !binary |-
+        MC4wMTQwMjE=
+      !binary "U2VydmVy":
+      - !binary |-
+        V0VCcmljay8xLjMuMSAoUnVieS8xLjkuMy8yMDEyLTAyLTE2KQ==
+      !binary "RGF0ZQ==":
+      - !binary |-
+        VHVlLCAwMSBKYW4gMjAxMyAxNDozNTowMSBHTVQ=
+      !binary "Q29ubmVjdGlvbg==":
+      - !binary |-
+        S2VlcC1BbGl2ZQ==
+    body:
+      encoding: US-ASCII
+      string: ! '{"access_token":"IoRYKHIu9uQn6QBQzu0aW4b3ZShztwEa2JFJq2-1PicTtx5DfRPVTz3eeHcRYxENVB0AvSr_DrB_GInqZurBkg","token_type":"bearer","expires_in":788939999}'
+    http_version: 
+  recorded_at: Tue, 01 Jan 2013 14:35:01 GMT
+- request:
+    method: get
+    uri: http://localhost:9292/quotes/50e2f3e73004f1a91b63f927-asap
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept:
+      - application/json
+      Content-Type:
+      - application/json
+      Authorization:
+      - Bearer IoRYKHIu9uQn6QBQzu0aW4b3ZShztwEa2JFJq2-1PicTtx5DfRPVTz3eeHcRYxENVB0AvSr_DrB_GInqZurBkg
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Length:
+      - '1561'
+      Content-Type:
+      - application/json;charset=utf-8
+      X-Frame-Options:
+      - sameorigin
+      X-Xss-Protection:
+      - 1; mode=block
+    body:
+      encoding: US-ASCII
+      string: ! '{"quote":{"id":"50e2f3e73004f1a91b63f927-asap","created_at":"2013-01-01T14:34+0000","valid_until":"2013-01-01T14:49+0000","merchant_price":"1313","customer_price":"1544","carrier_price":"1093.836994","pickup_start":"2013-01-01T15:04+0000","pickup_finish":"2013-01-01T15:24+0000","delivery_start":"2013-01-01T15:04+0000","delivery_finish":"2013-01-01T17:14+0000","vehicle_name":"Motor
+        bike","vehicle_reference":"bike 001","basket_value":1295,"delivery_postcode":"LU1
+        2LX","merchant_id":"maplins","merchant_name":"Maplins","merchant_shutl_account_number":"3462342","merchant_default_store_note":"Always
+        go through the till","pickup_id":"map1","pickup_address_line_1":"Park Street","pickup_address_line_2":"50-52
+        The Luton Arndale Centre","pickup_city":"Luton","pickup_postcode":"LU1 2TE","pickup_country":"United
+        Kingdom","pickup_notes":null,"pickup_notes_level_setting":"merchant","pickup_closing_time_notes_threshold":61,"pickup_location_type":"store","carrier_id":"ecourier","carrier_name":"eCourier","carrier_shutl_account_number":"3462342","carrier_operational_contact_name":"Barry
+        Johnson","carrier_operational_contact_email":"ecourier@example.com","carrier_operational_contact_phone":"+44
+        (0)207 754 0366","carrier_external_booking_url":"https://www.courier-systems.co.uk/shutl/shutlbooking","carrier_external_booking_client_key":"blah_key","carrier_external_booking_client_id":"client_id","carrier_external_booking_format":"json","carrier_external_booking_version":2.0,"products":[{"name":"Item","length":1,"width":1,"height":1,"weight":2,"quantity":1}]}}'
+    http_version: 
+  recorded_at: Tue, 01 Jan 2013 14:35:01 GMT
+recorded_with: VCR 2.3.0

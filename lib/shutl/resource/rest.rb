@@ -10,6 +10,7 @@ module Shutl::Resource
   module Rest
     extend HTTParty
     include ActiveModel::Serialization
+    include Shutl::Auth::AuthenticatedRequest
 
     attr_reader :response
 

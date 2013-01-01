@@ -1,13 +1,17 @@
 module Shutl::Resource
   module RestClassMethods
+    include Shutl::Auth::AuthenticatedRequest
+
     def find(args, params = {})
       unless args.kind_of?(Hash)
         id = args
         args = { resource_id_name => id }
       end
-      token = params.delete :auth
       url = member_url args.dup, params
-      response = get url, headers_with_auth(token)
+
+      response = authenticated_request do
+        get url, headers_with_auth
+      end
 
       check_fail response, "Failed to find #{name} with the id #{id}"
 
@@ -22,9 +26,11 @@ module Shutl::Resource
       url = generate_collection_url attributes
       attributes.delete "response"
 
-      response = post(url,
-        {body: {@resource_name => attributes}.to_json}.
-          merge(headers_with_auth options[:auth]))
+      response = authenticated_request do
+        post(url,
+             {body: {@resource_name => attributes}.to_json}.
+             merge(headers_with_auth))
+      end
 
       check_fail response, "Create failed"
 
@@ -37,12 +43,7 @@ module Shutl::Resource
     def destroy instance, options = {}
       message =  "Failed to destroy #{name.downcase.pluralize}"
 
-      perform_action(
-        instance,
-        :delete,
-        headers_with_auth(options[:auth]),
-        message
-      ).success?
+      perform_action(instance, :delete, headers_with_auth, message).success?
     end
 
     def save instance, options = {}
@@ -50,8 +51,8 @@ module Shutl::Resource
       attributes = instance.attributes rescue instance
 
       response = perform_action instance, :put,
-        {body: {@resource_name => convert_new_id(attributes)}.to_json}.merge(headers_with_auth options[:auth]),
-      "Save failed"
+        {body: {@resource_name => convert_new_id(attributes)}.to_json}.merge(headers_with_auth),
+        "Save failed"
 
       response.success?
     end
@@ -62,14 +63,13 @@ module Shutl::Resource
 
 
     def all(args = {})
-      token = args.delete :auth
       partition = args.partition {|key,value| !remote_collection_url.index(":#{key}").nil? }
 
       url_args = partition.first.inject({}) { |h,pair| h[pair.first] = pair.last ; h }
       params   = partition.last. inject({}) { |h,pair| h[pair.first] = pair.last ; h }
 
       url = generate_collection_url url_args, params
-      response = get url, headers_with_auth(token)
+      response = get url, headers_with_auth
 
       check_fail response, "Failed to find all #{name.downcase.pluralize}"
 
@@ -140,20 +140,22 @@ module Shutl::Resource
 
     private
 
-    def headers_with_auth token
-      { headers: headers.merge('Authorization' => "Bearer #{token}") }
+    def headers_with_auth
+      { headers: headers.merge('Authorization' => "Bearer #{access_token}") }
     end
 
     def perform_action instance, verb, args, failure_message
-      attributes = instance.is_a?(Hash) ?  instance : instance.attributes
-      attributes.delete "response" #used in debugging requests/responses
+      authenticated_request do
+        attributes = instance.is_a?(Hash) ?  instance : instance.attributes
+        attributes.delete "response" #used in debugging requests/responses
 
-      url = member_url attributes
-      response = send verb, url, args
+        url = member_url attributes
+        response = send verb, url, args
 
-      check_fail response, failure_message
+        check_fail response, failure_message
 
-      response
+        response
+      end
     end
 
     def new_object(args={}, response=nil)
