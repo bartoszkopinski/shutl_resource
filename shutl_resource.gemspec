@@ -26,6 +26,7 @@ Gem::Specification.new do |gem|
   gem.add_development_dependency 'rspec', '~> 2.11.0'
   gem.add_development_dependency 'debugger'   if $platform.to_s == 'ruby'
   gem.add_development_dependency 'ruby-debug' if $platform.to_s == 'java'
+  gem.add_development_dependency 'vcr'
 
   gem.add_development_dependency 'webmock', '~> 1.8.7'
 end
