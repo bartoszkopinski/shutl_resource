@@ -22,7 +22,7 @@ module Shutl::Resource
         'Content-Type'  => 'application/json'
       }
 
-      base.send :resource_name, base.name.underscore
+      base.send :resource_name, base.name.split('::').last.underscore
       base.send :resource_id,   :id
     end
 

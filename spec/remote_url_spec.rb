@@ -12,6 +12,12 @@ describe Shutl::Resource::Rest do
     resource_url '/api/resources/:name'
   end
 
+  module Namespace
+    class Resource
+      include Shutl::Resource::Rest
+    end
+  end
+
   describe '#remote_collection_url' do
     it 'should be based on the resource name by default' do
       TestRest.remote_collection_url.should == '/test_rests'
@@ -19,6 +25,10 @@ describe Shutl::Resource::Rest do
 
     it 'should use the override if defined' do
       OverrideUrlResource.remote_collection_url.should == '/api/resources'
+    end
+
+    it 'only uses the specific object to infer the resource name' do
+      Namespace::Resource.remote_collection_url.should == '/resources'
     end
   end
 
