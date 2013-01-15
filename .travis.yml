@@ -1,4 +1,8 @@
 language: ruby
+matrix:
+  allow_failures:
+    - jruby-19mode
+
 rvm:
   - 1.9.2
   - "1.9.3"
@@ -6,3 +10,5 @@ rvm:
 jdk:
   - openjdk7
   - oraclejdk7
+
+
