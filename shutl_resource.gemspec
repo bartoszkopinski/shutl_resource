@@ -19,7 +19,7 @@ Gem::Specification.new do |gem|
   gem.version       = Shutl::Resource::VERSION
 
   gem.add_dependency 'httparty', '~> 0.10.0'
-  gem.add_dependency 'shutl_auth', '0.0.2'
+  gem.add_dependency 'shutl_auth', '0.8.0'
   gem.add_dependency 'activemodel'
 
   gem.add_development_dependency 'rake'
