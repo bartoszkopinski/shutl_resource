@@ -7,7 +7,7 @@ module Shutl::Resource
 
     def raise_exceptions_on_validation
       if @raise_exceptions_on_validation.nil?
-        @raise_exceptions_on_validation = true
+        @raise_exceptions_on_validation = false
       end
 
       @raise_exceptions_on_validation
