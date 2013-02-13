@@ -1,5 +1,7 @@
 # Shutl::Resource
 
+[![Build Status](https://travis-ci.org/shutl/shutl_resource.png?branch=master)](https://travis-ci.org/shutl/shutl_resource)
+
 Yep this is ActiveResource-esque.
 
 Abstracted from our backend, but no reason to not make this public. Possibly
