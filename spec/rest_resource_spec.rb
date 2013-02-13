@@ -43,6 +43,7 @@ describe Shutl::Resource::Rest do
         resource.instance_variable_get('@b').should == 2
       end
 
+      Shutl::Resource.raise_exceptions_on_validation = true
       {
         400 => Shutl::BadRequest,
         401 => Shutl::UnauthorizedAccess,
