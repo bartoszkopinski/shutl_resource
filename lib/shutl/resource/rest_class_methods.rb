@@ -9,6 +9,7 @@ module Shutl::Resource
       url = member_url args.dup, params
       response = get url, headers_with_auth(token)
 
+
       check_fail response, "Failed to find #{name} with the id #{id}"
 
       parsed = response.parsed_response
@@ -193,7 +194,14 @@ module Shutl::Resource
                         Shutl::ServerError
                       end
 
-      raise failure_klass.new message, response if failure_klass
+
+      output = begin
+                 response.parsed_response["errors"]["base"]
+               rescue
+                 message
+               end
+
+      raise failure_klass.new output, response if failure_klass
     end
 
     protected
