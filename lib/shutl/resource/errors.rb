@@ -9,10 +9,9 @@ class Shutl::Resource::Error < ::IOError
 end
 
 # This NoQuotesGenerated is shutl specific corresponding to HTTP status 299.
-# We had a good think about what the correct HTTP code is for the case that
-# the request is fine, but we couldn't generate any quotes. It doesn't feel
-# like a 4xx or a 5xx, but not quite like a 2xx either. Comments/thoughts
-# more than welcome.
+# The correct solution to this would be to remove this exception from the gem
+# and handle specifically in a QuoteCollection resource in for example the
+# 'shutl' gem.
 Shutl::NoQuotesGenerated  = Class.new Shutl::Resource::Error
 
 Shutl::BadRequest         = Class.new Shutl::Resource::Error
