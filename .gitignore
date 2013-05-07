@@ -11,3 +11,4 @@ vendor
 
 pkg
 Gemfile.lock
+bin
