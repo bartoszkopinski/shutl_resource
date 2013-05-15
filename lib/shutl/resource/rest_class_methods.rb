@@ -148,6 +148,7 @@ module Shutl::Resource
        h['Authorization'] = "Bearer #{options[:auth]}" if options[:auth]
        h['From']          = "#{options[:from]}"        if options[:from]
       end
+      { headers: headers }
     end
 
     def perform_action instance, verb, args, failure_message
