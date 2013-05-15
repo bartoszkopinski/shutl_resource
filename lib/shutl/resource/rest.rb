@@ -63,7 +63,7 @@ module Shutl::Resource
     end
 
     def respond_to? method
-      self.instance_variables.include?(:"@#{method}")
+      self.instance_variables.include?(:"@#{method}") ? true : super
     end
 
     def parsed
