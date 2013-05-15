@@ -5,9 +5,9 @@ module Shutl::Resource
         id = args
         args = { resource_id_name => id }
       end
-      token = params.delete :auth
+      auth_options = { auth: params.delete(:auth), from: params.delete(:from) }
       url = member_url args.dup, params
-      response = get url, headers_with_auth(token)
+      response = get url, headers_with_auth(auth_options)
 
 
       check_fail response, "Failed to find #{name} with the id #{id}"
@@ -23,9 +23,11 @@ module Shutl::Resource
       url = generate_collection_url attributes
       attributes.delete "response"
 
-      response = post(url,
-        {body: {@resource_name => attributes}.to_json}.
-          merge(headers_with_auth options[:auth]))
+      response = post(
+          url,
+          {body: {@resource_name => attributes}.to_json}.
+          merge(headers_with_auth(options))
+        )
 
       check_fail response, "Create failed"
 
@@ -41,7 +43,7 @@ module Shutl::Resource
       perform_action(
         instance,
         :delete,
-        headers_with_auth(options[:auth]),
+        headers_with_auth(options),
         message
       ).success?
     end
@@ -51,7 +53,7 @@ module Shutl::Resource
       attributes = instance.attributes rescue instance
 
       response = perform_action instance, :put,
-        {body: {@resource_name => convert_new_id(attributes)}.to_json}.merge(headers_with_auth options[:auth]),
+        {body: {@resource_name => convert_new_id(attributes)}.to_json}.merge(headers_with_auth options),
       "Save failed"
 
       response.success?
@@ -63,14 +65,14 @@ module Shutl::Resource
 
 
     def all(args = {})
-      token = args.delete :auth
+      auth_options = { auth: args.delete(:auth), from: args.delete(:from) }
       partition = args.partition {|key,value| !remote_collection_url.index(":#{key}").nil? }
 
       url_args = partition.first.inject({}) { |h,pair| h[pair.first] = pair.last ; h }
       params   = partition.last. inject({}) { |h,pair| h[pair.first] = pair.last ; h }
 
       url = generate_collection_url url_args, params
-      response = get url, headers_with_auth(token)
+      response = get url, headers_with_auth(auth_options)
 
       check_fail response, "Failed to find all #{name.downcase.pluralize}"
 
@@ -141,8 +143,10 @@ module Shutl::Resource
 
     private
 
-    def headers_with_auth token
-      { headers: headers.merge('Authorization' => "Bearer #{token}") }
+    def headers_with_auth options = {}
+      { headers: headers.merge('Authorization' => "Bearer #{options[:auth]}") } if options[:auth]
+      { headers: headers.merge('From' => "#{options[:from]}") }                 if options[:from]
+      headers
     end
 
     def perform_action instance, verb, args, failure_message
