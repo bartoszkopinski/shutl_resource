@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe Shutl::Resource::Rest do
   let(:headers) do
-    {'Accept'=>'application/json', 'Authorization'=>'Bearer', 'Content-Type'=>'application/json'}
+    {'Accept'=>'application/json', 'Content-Type'=>'application/json'}
   end
 
   it 'should include the REST verb' do
