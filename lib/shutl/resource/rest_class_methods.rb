@@ -144,9 +144,10 @@ module Shutl::Resource
     private
 
     def headers_with_auth options = {}
-      { headers: headers.merge('Authorization' => "Bearer #{options[:auth]}") } if options[:auth]
-      { headers: headers.merge('From' => "#{options[:from]}") }                 if options[:from]
-      headers
+      headers.tap do |h|
+       h['Authorization'] = "Bearer #{options[:auth]}" if options[:auth]
+       h['From']          = "#{options[:from]}"        if options[:from]
+      end
     end
 
     def perform_action instance, verb, args, failure_message
