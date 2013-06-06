@@ -164,7 +164,7 @@ module Shutl::Resource
     end
 
     def new_object(args={}, response=nil)
-      instance = new add_resource_id_to(args), response
+      instance = new add_resource_id_to(args)
 
       instance.tap do |i|
         parsed_response = response.parsed_response
