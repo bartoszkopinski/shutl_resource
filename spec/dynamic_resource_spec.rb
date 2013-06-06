@@ -58,8 +58,5 @@ describe Shutl::Resource::Rest do
       resource.instance_variable_get(:@a).should == 'c'
 
     end
-
-    it 'should use a white list permission'
-
   end
 end

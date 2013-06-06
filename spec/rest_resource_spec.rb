@@ -303,8 +303,10 @@ describe Shutl::Resource::Rest do
   describe '#update!' do
     it 'should post the new json representation' do
       request = stub_request(:put, "http://host/test_rests/a").
-        with(:body => '{"test_rest":{"a":"a","id":"a","b":"b"}}',
-             headers: headers)
+        with(:body => {test_rest:{a:"a",b:"b",id:"a"}},
+             :headers => {'Accept'=>'application/json', 'Content-Type'=>'application/json'}).
+        to_return(:status => 200, :body => "", :headers => {})
+
       test_resource = TestRest.new
 
       test_resource.update!(a: 'a', b: 'b')
@@ -314,8 +316,9 @@ describe Shutl::Resource::Rest do
 
     it 'should convert new_id to id in attributes' do
       request = stub_request(:put, "http://host/test_rests/a").
-         with(:body => "{\"test_rest\":{\"a\":\"a\",\"id\":\"xxx\",\"b\":\"b\"}}",
-              :headers => headers)
+        with(:body => {test_rest:{a:"a",b:"b",id:"xxx"}},
+             :headers => {'Accept'=>'application/json', 'Content-Type'=>'application/json'}).
+        to_return(:status => 200, :body => "", :headers => {})
 
       test_resource = TestRest.new
 
