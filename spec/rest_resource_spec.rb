@@ -110,8 +110,12 @@ describe Shutl::Resource::Rest do
 
     context 'with no arguments' do
       before do
+        body = '{
+          "test_rests": [{ "a": "a", "b": 2 }],
+          "pagination":{"page": 0,"size": 1,"total": 3}
+        }'
         @request = stub_request(:get, 'http://host/test_rests').
-          to_return(:status => 200, :body => '{"test_rests": [{ "a": "a", "b": 2 }]}', :headers => headers)
+          to_return(:status => 200, :body => body, :headers => headers)
       end
 
       it 'should query the endpoint' do
@@ -131,6 +135,13 @@ describe Shutl::Resource::Rest do
 
         resource.first.instance_variable_get('@a').should == 'a'
         resource.first.instance_variable_get('@b').should == 2
+      end
+
+      it 'should provide accessor to pagination' do
+        resource = TestRest.all
+        resource.pagination.page .should == 0
+        resource.pagination.size .should == 1
+        resource.pagination.total.should == 3
       end
 
       it 'should raise an error of the request fails' do

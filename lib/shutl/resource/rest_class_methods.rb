@@ -76,8 +76,31 @@ module Shutl::Resource
 
       check_fail response, "Failed to find all #{name.downcase.pluralize}"
 
-      response.parsed_response[@resource_name.pluralize].map do |h|
+      response_object = response.parsed_response[@resource_name.pluralize].map do |h|
         new_object(args.merge(h), response)
+      end
+      RestCollection.new(response_object, response.parsed_response['pagination'])
+    end
+
+    class RestCollection
+      include Enumerable
+
+      attr_reader :collection
+
+      def initialize(collection, pagination)
+        @collection = collection
+        @pagination = pagination
+      end
+
+      delegate :each, to: :collection
+
+      class Pagination < Struct.new(:page, :size, :total); end
+
+      def pagination
+        return unless @pagination
+        Pagination.new(@pagination['page'],
+                       @pagination['size'],
+                       @pagination['total'])
       end
     end
 
