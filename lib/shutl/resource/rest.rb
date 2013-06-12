@@ -31,6 +31,10 @@ module Shutl::Resource
       @response = response
     end
 
+    def as_json(_)
+      attributes
+    end
+
     def to_json(options = nil)
       {
         :"#{prefix}" => attributes
