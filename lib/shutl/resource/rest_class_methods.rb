@@ -2,12 +2,12 @@ module Shutl::Resource
   module RestClassMethods
     def find(args, params = {})
       unless args.kind_of?(Hash)
-        id = args
+        id   = args
         args = { resource_id_name => id }
       end
       auth_options = { auth: params.delete(:auth), from: params.delete(:from) }
-      url = member_url args.dup, params
-      response = get url, headers_with_auth(auth_options)
+      url          = member_url args.dup, params
+      response     = get url, headers_with_auth(auth_options)
 
 
       check_fail response, "Failed to find #{name} with the id #{id}"
@@ -24,21 +24,20 @@ module Shutl::Resource
       attributes.delete "response"
 
       response = post(
-          url,
-          {body: {@resource_name => attributes}.to_json}.
-          merge(headers_with_auth(options))
-        )
+        url,
+        { body: { @resource_name => attributes }.to_json }.merge(headers_with_auth(options))
+      )
 
       check_fail response, "Create failed"
 
-      parsed = response.parsed_response || {}
-
+      parsed     = response.parsed_response || {}
       attributes = parsed[@resource_name] || {}
+
       new_object attributes, response
     end
 
     def destroy instance, options = {}
-      message =  "Failed to destroy #{name.downcase.pluralize}"
+      message = "Failed to destroy #{name.downcase.pluralize}"
 
       perform_action(
         instance,
@@ -52,9 +51,12 @@ module Shutl::Resource
       #TODO: this is sometimes a hash and sometimes a Rest - need to rethink this
       attributes = instance.attributes rescue instance
 
-      response = perform_action instance, :put,
-        {body: {@resource_name => convert_new_id(attributes)}.to_json}.merge(headers_with_auth options),
-      "Save failed"
+      payload = {
+        body: { @resource_name => convert_new_id(attributes) }.to_json
+      }
+
+      payload_with_headers = payload.merge(headers_with_auth options)
+      response             = perform_action(instance, :put, payload, "Save failed")
 
       response.success?
     end
@@ -66,12 +68,12 @@ module Shutl::Resource
 
     def all(args = {})
       auth_options = { auth: args.delete(:auth), from: args.delete(:from) }
-      partition = args.partition {|key,value| !remote_collection_url.index(":#{key}").nil? }
+      partition    = args.partition { |key, value| !remote_collection_url.index(":#{key}").nil? }
 
-      url_args = partition.first.inject({}) { |h,pair| h[pair.first] = pair.last ; h }
-      params   = partition.last. inject({}) { |h,pair| h[pair.first] = pair.last ; h }
+      url_args = partition.first.inject({}) { |h, pair| h[pair.first] = pair.last; h }
+      params   = partition.last.inject({}) { |h, pair| h[pair.first] = pair.last; h }
 
-      url = generate_collection_url url_args, params
+      url      = generate_collection_url url_args, params
       response = get url, headers_with_auth(auth_options)
 
       check_fail response, "Failed to find all #{name.downcase.pluralize}"
@@ -94,13 +96,18 @@ module Shutl::Resource
 
       delegate :each, to: :collection
 
-      class Pagination < Struct.new(:page, :size, :total); end
+      class Pagination < Struct.new(:page,
+                                    :items_on_page,
+                                    :total_count,
+                                    :number_of_pages)
+      end
 
       def pagination
-        return unless @pagination
+        return unless @pagination.present?
         Pagination.new(@pagination['page'],
-                       @pagination['size'],
-                       @pagination['total'])
+                       @pagination['items_on_page'],
+                       @pagination['total_count'],
+                       @pagination['number_of_pages'])
       end
     end
 
@@ -134,7 +141,7 @@ module Shutl::Resource
 
     def convert_new_id attributes
       if attributes[:new_id]
-        attributes = attributes.clone.tap {|h| h[:id] = h[:new_id]; h.delete(:new_id)}
+        attributes = attributes.clone.tap { |h| h[:id] = h[:new_id]; h.delete(:new_id) }
       end
 
       attributes
@@ -143,7 +150,7 @@ module Shutl::Resource
     def add_resource_id_to args={}
       args = args.dup.with_indifferent_access
       unless args.has_key? "id"
-        args.merge!({"id" => args[resource_id_name]})
+        args.merge!({ "id" => args[resource_id_name] })
       end
       args
     end
@@ -168,17 +175,17 @@ module Shutl::Resource
 
     def headers_with_auth options = {}
       headers.tap do |h|
-       h['Authorization'] = "Bearer #{options[:auth]}" if options[:auth]
-       h['From']          = "#{options[:from]}"        if options[:from]
+        h['Authorization'] = "Bearer #{options[:auth]}" if options[:auth]
+        h['From'] = "#{options[:from]}" if options[:from]
       end
       { headers: headers }
     end
 
     def perform_action instance, verb, args, failure_message
-      attributes = instance.is_a?(Hash) ?  instance : instance.attributes
+      attributes = instance.is_a?(Hash) ? instance : instance.attributes
       attributes.delete "response" #used in debugging requests/responses
 
-      url = member_url attributes
+      url      = member_url attributes
       response = send verb, url, args
 
       check_fail response, failure_message
@@ -199,7 +206,7 @@ module Shutl::Resource
     end
 
     def check_fail response, message
-      c = response.code
+      c             = response.code
       failure_klass = case c
                       when 299 then Shutl::NoQuotesGenerated
                       when 400 then Shutl::BadRequest
@@ -250,7 +257,7 @@ module Shutl::Resource
 
     private
     def replace_args_from_pattern! args, url
-      args = args.reject! do |key,value|
+      args = args.reject! do |key, value|
         if s = url[":#{key}"]
           url.gsub!(s, value.to_s)
         end

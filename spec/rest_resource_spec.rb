@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe Shutl::Resource::Rest do
   let(:headers) do
-    {'Accept'=>'application/json', 'Content-Type'=>'application/json'}
+    { 'Accept' => 'application/json', 'Content-Type' => 'application/json' }
   end
 
   it 'should include the REST verb' do
@@ -12,14 +12,14 @@ describe Shutl::Resource::Rest do
     TestRest.should respond_to :delete
   end
 
-  let(:resource) { TestRest.new(a: 'a', b: 2)  }
+  let(:resource) { TestRest.new(a: 'a', b: 2) }
 
   describe '#find' do
     context 'with no arguments' do
       before do
         @request = stub_request(:get, 'http://host/test_rests/a').
-          to_return(:status => 200,
-                    :body => '{"test_rest": { "a": "a", "b": 2 }}',
+          to_return(:status  => 200,
+                    :body    => '{"test_rest": { "a": "a", "b": 2 }}',
                     :headers => headers)
       end
 
@@ -45,14 +45,14 @@ describe Shutl::Resource::Rest do
 
       Shutl::Resource.raise_exceptions_on_validation = true
       {
-        400 => Shutl::BadRequest,
-        401 => Shutl::UnauthorizedAccess,
-        403 => Shutl::ForbiddenAccess,
-        404 => Shutl::ResourceNotFound,
-        409 => Shutl::ResourceConflict,
-        410 => Shutl::ResourceGone,
-        422 => Shutl::ResourceInvalid,
-        503 => Shutl::ServiceUnavailable,
+        400      => Shutl::BadRequest,
+        401      => Shutl::UnauthorizedAccess,
+        403      => Shutl::ForbiddenAccess,
+        404      => Shutl::ResourceNotFound,
+        409      => Shutl::ResourceConflict,
+        410      => Shutl::ResourceGone,
+        422      => Shutl::ResourceInvalid,
+        503      => Shutl::ServiceUnavailable,
         501..502 => Shutl::ServerError,
         504..599 => Shutl::ServerError
       }.each do |status, exception|
@@ -62,7 +62,7 @@ describe Shutl::Resource::Rest do
               stub_request(:get, 'http://host/test_rests/b').
                 to_return(status: s.to_i)
 
-              expect(->{TestRest.find('b')}).to raise_error(exception)
+              expect(-> { TestRest.find('b') }).to raise_error(exception)
             end
           else
             stub_request(:get, 'http://host/test_rests/b').
@@ -83,7 +83,7 @@ describe Shutl::Resource::Rest do
 
     it 'should encode the url to support spaces' do
       request = stub_request(:get, 'http://host/test_rests/new%20resource').
-        to_return(:status => 200, :body => '{"test_rest": {}}',
+        to_return(:status  => 200, :body => '{"test_rest": {}}',
                   :headers => headers)
 
       TestRest.find('new resource')
@@ -110,9 +110,9 @@ describe Shutl::Resource::Rest do
 
     context 'with no arguments' do
       before do
-        body = '{
+        body     = '{
           "test_rests": [{ "a": "a", "b": 2 }],
-          "pagination":{"page": 0,"size": 1,"total": 3}
+          "pagination":{"page": 0,"items_on_page": 1,"total_count": 3, "number_of_pages": 3}
         }'
         @request = stub_request(:get, 'http://host/test_rests').
           to_return(:status => 200, :body => body, :headers => headers)
@@ -139,16 +139,17 @@ describe Shutl::Resource::Rest do
 
       it 'should provide accessor to pagination' do
         resource = TestRest.all
-        resource.pagination.page .should == 0
-        resource.pagination.size .should == 1
-        resource.pagination.total.should == 3
+        resource.pagination.page.should            == 0
+        resource.pagination.items_on_page.should   == 1
+        resource.pagination.total_count.should     == 3
+        resource.pagination.number_of_pages.should == 3
       end
 
       it 'should raise an error of the request fails' do
         stub_request(:get, 'http://host/test_rests').
           to_return(:status => 403)
 
-        lambda { TestRest.all}.should raise_error(Shutl::ForbiddenAccess)
+        lambda { TestRest.all }.should raise_error(Shutl::ForbiddenAccess)
 
       end
     end
@@ -178,13 +179,13 @@ describe Shutl::Resource::Rest do
         Shutl::Resource.raise_exceptions_on_validation = true
       end
       specify do
-        errors = {"base" => "invalid", "some_field" => "some field is invalid"}
-        body = {"errors" => errors}.to_json
+        errors = { "base" => "invalid", "some_field" => "some field is invalid" }
+        body   = { "errors" => errors }.to_json
 
         @request = stub_request(:post, 'http://host/test_rests').
           to_return(:status => 422, body: body, :headers => headers)
 
-        expect{@instance = TestRest.create}.to_not raise_error Shutl::ResourceInvalid
+        expect { @instance = TestRest.create }.to_not raise_error Shutl::ResourceInvalid
 
         @request.should have_been_requested
         @instance.should_not be_valid
@@ -208,7 +209,7 @@ describe Shutl::Resource::Rest do
 
     it 'should raise error if the remote server returns an error' do
       request = stub_post 403
-      expect(->{TestRest.create}).to raise_error Shutl::ForbiddenAccess
+      expect(-> { TestRest.create }).to raise_error Shutl::ForbiddenAccess
 
       request.should have_been_requested
     end
@@ -216,7 +217,7 @@ describe Shutl::Resource::Rest do
 
     it 'should post the header content-type: json' do
       request = stub_request(:post, 'http://host/test_rests').
-        with(:body => "{\"test_rest\":{}}", :headers => headers )
+        with(:body => "{\"test_rest\":{}}", :headers => headers)
 
       TestRest.create
 
@@ -227,13 +228,13 @@ describe Shutl::Resource::Rest do
       request = stub_request(:post, 'http://host/test_rests').
         to_return(:status => 400)
 
-      expect(->{ TestRest.create}).to raise_error(Shutl::BadRequest)
+      expect(-> { TestRest.create }).to raise_error(Shutl::BadRequest)
     end
 
 
     it 'shoud create a new ressource with the attributes' do
       request = stub_request(:post, "http://host/test_rests").
-        with(body: '{"test_rest":{"a":"a","b":"b"}}',
+        with(body:    '{"test_rest":{"a":"a","b":"b"}}',
              headers: headers)
 
       TestRest.create(a: 'a', b: 'b')
@@ -264,7 +265,7 @@ describe Shutl::Resource::Rest do
       stub_request(:delete, 'http://host/test_rests/a').
         to_return(status: 400)
 
-      expect(->{TestRest.destroy(id: 'a')}).to raise_error Shutl::BadRequest
+      expect(-> { TestRest.destroy(id: 'a') }).to raise_error Shutl::BadRequest
     end
   end
 
@@ -288,7 +289,7 @@ describe Shutl::Resource::Rest do
       stub_request(:put, 'http://host/test_rests/a').
         to_return(status: 400)
 
-      ->{resource.save}.should raise_error Shutl::BadRequest
+      -> { resource.save }.should raise_error Shutl::BadRequest
     end
 
 
@@ -307,15 +308,15 @@ describe Shutl::Resource::Rest do
       stub_request(:put, 'http://host/test_rests/a').
         to_return(status: 400)
 
-      expect(->{ resource.save }).to raise_error(Shutl::BadRequest)
+      expect(-> { resource.save }).to raise_error(Shutl::BadRequest)
     end
   end
 
   describe '#update!' do
     it 'should post the new json representation' do
       request = stub_request(:put, "http://host/test_rests/a").
-        with(:body => {test_rest:{a:"a",b:"b",id:"a"}},
-             :headers => {'Accept'=>'application/json', 'Content-Type'=>'application/json'}).
+        with(:body    => { test_rest: { a: "a", b: "b", id: "a" } },
+             :headers => { 'Accept' => 'application/json', 'Content-Type' => 'application/json' }).
         to_return(:status => 200, :body => "", :headers => {})
 
       test_resource = TestRest.new
@@ -327,8 +328,8 @@ describe Shutl::Resource::Rest do
 
     it 'should convert new_id to id in attributes' do
       request = stub_request(:put, "http://host/test_rests/a").
-        with(:body => {test_rest:{a:"a",b:"b",id:"xxx"}},
-             :headers => {'Accept'=>'application/json', 'Content-Type'=>'application/json'}).
+        with(:body    => { test_rest: { a: "a", b: "b", id: "xxx" } },
+             :headers => { 'Accept' => 'application/json', 'Content-Type' => 'application/json' }).
         to_return(:status => 200, :body => "", :headers => {})
 
       test_resource = TestRest.new
@@ -338,7 +339,6 @@ describe Shutl::Resource::Rest do
       request.should have_been_requested
     end
   end
-
 
 
 end
