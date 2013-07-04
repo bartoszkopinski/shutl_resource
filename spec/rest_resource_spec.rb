@@ -159,7 +159,7 @@ describe Shutl::Resource::Rest do
       context 'ordering the collection' do
         let(:body) do
           '{
-            "test_rests": [{ "name": "d" }, {"name": "e"}, {"name": "a"}],
+            "test_rests": [{ "name": "D" }, {"name": "e"}, {"name": "a"}],
             "pagination":{"page": 0,"items_on_page": 1,"total_count": 3, "number_of_pages": 3}
           }'
         end
@@ -173,7 +173,7 @@ describe Shutl::Resource::Rest do
         end
 
         it 're-orders the result' do
-          TestRest.all.map(&:name).should == %w(a d e)
+          TestRest.all.map(&:name).should == %w(a D e)
         end
       end
     end

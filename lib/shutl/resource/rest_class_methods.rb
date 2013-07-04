@@ -83,9 +83,12 @@ module Shutl::Resource
       end
       if order_collection?
         response_object.sort! do |a,b|
-          a.send(@order_collection_by) <=> b.send(@order_collection_by)
+          str_a = a.send(@order_collection_by).to_s
+          str_b = b.send(@order_collection_by).to_s
+          str_a.casecmp(str_b)
         end
       end
+
       RestCollection.new(response_object, response.parsed_response['pagination'])
     end
 
