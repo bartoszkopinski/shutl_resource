@@ -81,6 +81,11 @@ module Shutl::Resource
       response_object = response.parsed_response[@resource_name.pluralize].map do |h|
         new_object(args.merge(h), response)
       end
+      if order_collection?
+        response_object.sort! do |a,b|
+          a.send(@order_collection_by) <=> b.send(@order_collection_by)
+        end
+      end
       RestCollection.new(response_object, response.parsed_response['pagination'])
     end
 
@@ -137,6 +142,10 @@ module Shutl::Resource
 
     def resource_url(url)
       @remote_resource_url = url
+    end
+
+    def order_collection_by(field)
+      @order_collection_by = field
     end
 
     def convert_new_id attributes
@@ -253,6 +262,10 @@ module Shutl::Resource
         params.each { |key, value| url += "#{key}=#{value}&" }
       end
       url
+    end
+
+    def order_collection?
+      !!@order_collection_by
     end
 
     private
