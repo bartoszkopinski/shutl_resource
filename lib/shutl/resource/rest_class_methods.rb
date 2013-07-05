@@ -1,8 +1,10 @@
 module Shutl::Resource
   module RestClassMethods
     def find(args = {}, params = {})
+      params = args if @singular_resource
+      auth_options = { auth: params.delete(:auth), from: params.delete(:from) }
+
       if @singular_resource
-        params = args
         url    = singular_member_url params
       elsif !args.kind_of?(Hash)
         id   = args
@@ -12,10 +14,9 @@ module Shutl::Resource
         url = member_url args.dup, params
       end
 
-      auth_options = { auth: params.delete(:auth), from: params.delete(:from) }
       response     = get url, headers_with_auth(auth_options)
 
-      check_fail response, "Failed to find #{name} with the id #{id}"
+      check_fail response, "Failed to find #{name}! args: #{args}, params: #{params}"
 
       parsed = response.parsed_response
 

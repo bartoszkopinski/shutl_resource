@@ -50,28 +50,32 @@ describe Shutl::Resource::Rest do
     end
 
     context 'with no arguments' do
+      let(:headers_with_auth) do
+        headers.merge("Authorization" => "Bearer some auth")
+      end
+
       before do
         @request = stub_request(:get, 'http://host/test_rests/a').
           to_return(:status  => 200,
                     :body    => '{"test_rest": { "a": "a", "b": 2 }}',
-                    :headers => headers)
+                    :headers => headers_with_auth)
       end
 
       it 'should query the endpoint' do
-        TestRest.find('a')
+        TestRest.find('a', auth: "some auth")
 
         @request.should have_been_requested
       end
 
       it 'should parse the result of the body to create an object' do
-        resource = TestRest.find('a')
+        resource = TestRest.find('a', auth: "some auth")
 
         resource.should_not be_nil
         resource.should be_kind_of TestRest
       end
 
       it 'should assign the attributes based on the json returned' do
-        resource = TestRest.find('a')
+        resource = TestRest.find('a', auth: "some auth")
 
         resource.instance_variable_get('@a').should == 'a'
         resource.instance_variable_get('@b').should == 2
