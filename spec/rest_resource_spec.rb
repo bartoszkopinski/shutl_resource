@@ -143,11 +143,14 @@ describe Shutl::Resource::Rest do
   describe '#all' do
 
     context 'with no arguments' do
-      before do
-        body     = '{
+      let(:body) do
+        '{
           "test_rests": [{ "a": "a", "b": 2 }],
           "pagination":{"page": 0,"items_on_page": 1,"total_count": 3, "number_of_pages": 3}
         }'
+      end
+
+      before do
         @request = stub_request(:get, 'http://host/test_rests').
           to_return(:status => 200, :body => body, :headers => headers)
       end
@@ -185,6 +188,27 @@ describe Shutl::Resource::Rest do
 
         lambda { TestRest.all }.should raise_error(Shutl::ForbiddenAccess)
 
+      end
+
+      context 'ordering the collection' do
+        let(:body) do
+          '{
+            "test_rests": [{ "name": "D" }, {"name": "e"}, {"name": "a"}],
+            "pagination":{"page": 0,"items_on_page": 1,"total_count": 3, "number_of_pages": 3}
+          }'
+        end
+
+        before do
+          TestRest.order_collection_by :name
+        end
+
+        after do
+          TestRest.instance_variable_set(:@order_collection_by, nil)
+        end
+
+        it 're-orders the result' do
+          TestRest.all.map(&:name).should == %w(a D e)
+        end
       end
     end
 
