@@ -1,21 +1,25 @@
 module Shutl::Resource
   module RestClassMethods
-    def find(args, params = {})
-      unless args.kind_of?(Hash)
+    def find(args = {}, params = {})
+      if @singular_resource
+        params = args
+        url    = singular_member_url params
+      elsif !args.kind_of?(Hash)
         id   = args
         args = { resource_id_name => id }
+        url  = member_url args.dup, params
+      else
+        url = member_url args.dup, params
       end
-      auth_options = { auth: params.delete(:auth), from: params.delete(:from) }
-      url          = member_url args.dup, params
-      response     = get url, headers_with_auth(auth_options)
 
+      auth_options = { auth: params.delete(:auth), from: params.delete(:from) }
+      response     = get url, headers_with_auth(auth_options)
 
       check_fail response, "Failed to find #{name} with the id #{id}"
 
       parsed = response.parsed_response
 
       including_parent_attributes = parsed[@resource_name].merge args
-
       new_object including_parent_attributes, response
     end
 
@@ -111,6 +115,10 @@ module Shutl::Resource
       end
     end
 
+    def singular_resource
+      @singular_resource = true
+    end
+
     def resource_name(name)
       instance_variable_set :@resource_name, name
     end
@@ -155,8 +163,13 @@ module Shutl::Resource
       args
     end
 
+    def singular_member_url params={}
+      generate_url! "/#{@resource_name}", params
+    end
+
     def member_url *args
       attributes = args.first.with_indifferent_access
+
       unless attributes[resource_id_name] ||= attributes[:id]
         raise ArgumentError, "Missing resource id with name: `#{resource_id_name}' for #{self}"
       end

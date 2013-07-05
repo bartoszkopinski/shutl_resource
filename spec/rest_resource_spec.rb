@@ -15,6 +15,40 @@ describe Shutl::Resource::Rest do
   let(:resource) { TestRest.new(a: 'a', b: 2) }
 
   describe '#find' do
+    context "with a singular resource" do
+      let(:resource) { TestSingularResource.new }
+      let(:headers_with_auth) do
+        headers.merge("Authorization" => "Bearer some auth")
+      end
+
+      before do
+        @request = stub_request(:get, 'http://host/test_singular_resource').
+          to_return(:status  => 200,
+                    :body    => '{"test_singular_resource": { "a": "a", "b": 2 }}',
+                    :headers => headers)
+      end
+
+      it 'queries the endpoint' do
+        TestSingularResource.find(auth: "some auth")
+
+        @request.should have_been_requested
+      end
+
+      it 'should parse the result of the body to create an object' do
+        resource = TestSingularResource.find(auth: "some auth")
+
+        resource.should_not be_nil
+        resource.should be_kind_of TestSingularResource
+      end
+
+      it 'should assign the attributes based on the json returned' do
+        resource = TestSingularResource.find(auth: "some auth")
+
+        resource.a.should == 'a'
+        resource.b.should == 2
+      end
+    end
+
     context 'with no arguments' do
       before do
         @request = stub_request(:get, 'http://host/test_rests/a').
