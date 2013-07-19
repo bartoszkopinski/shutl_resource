@@ -1,9 +1,9 @@
 require 'logger'
 
 module Shutl::Resource
-
   class << self
-    attr_writer :raise_exceptions_on_validation
+    attr_writer :raise_exceptions_on_validation,
+                :raise_exceptions_on_no_quotes_generated
 
     def raise_exceptions_on_validation
       if @raise_exceptions_on_validation.nil?
@@ -11,6 +11,14 @@ module Shutl::Resource
       end
 
       @raise_exceptions_on_validation
+    end
+
+    def raise_exceptions_on_no_quotes_generated
+      if @raise_exceptions_on_no_quotes_generated.nil?
+        @raise_exceptions_on_no_quotes_generated = true
+      end
+
+      @raise_exceptions_on_no_quotes_generated
     end
   end
 

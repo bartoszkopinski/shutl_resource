@@ -234,7 +234,13 @@ module Shutl::Resource
     def check_fail response, message
       c             = response.code
       failure_klass = case c
-                      when 299 then Shutl::NoQuotesGenerated
+                      when 299
+                        if Shutl::Resource.raise_exceptions_on_no_quotes_generated
+                          Shutl::NoQuotesGenerated
+                        else
+                          nil
+                        end
+
                       when 400 then Shutl::BadRequest
                       when 401 then Shutl::UnauthorizedAccess
                       when 403 then Shutl::ForbiddenAccess

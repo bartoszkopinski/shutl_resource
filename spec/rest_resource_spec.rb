@@ -81,15 +81,44 @@ describe Shutl::Resource::Rest do
         resource.instance_variable_get('@b').should == 2
       end
 
-      Shutl::Resource.raise_exceptions_on_validation = true
+      context "299" do
+        specify do
+          @default = Shutl::Resource.raise_exceptions_on_no_quotes_generated
+          Shutl::Resource.raise_exceptions_on_no_quotes_generated = false
+
+          stub_request(:get, 'http://host/test_rests/b').
+            to_return(status: 299, :body => '{"errors": {"base":["No quotes for you today"]}}')
+
+          expect(-> { TestRest.find('b') }).not_to raise_error Shutl::NoQuotesGenerated
+          Shutl::Resource.raise_exceptions_on_no_quotes_generated = @default
+        end
+      end
+
+      context "422" do
+        before do
+          @default = Shutl::Resource.raise_exceptions_on_validation
+          Shutl::Resource.raise_exceptions_on_validation = true
+        end
+
+        after do
+          Shutl::Resource.raise_exceptions_on_validation = @default
+        end
+        specify do
+          stub_request(:get, 'http://host/test_rests/b').
+            to_return(status: 422)
+
+          expect(-> { TestRest.find('b') }).to raise_error(Shutl::ResourceInvalid)
+        end
+      end
+
       {
+        299      => Shutl::NoQuotesGenerated,
         400      => Shutl::BadRequest,
         401      => Shutl::UnauthorizedAccess,
         403      => Shutl::ForbiddenAccess,
         404      => Shutl::ResourceNotFound,
         409      => Shutl::ResourceConflict,
         410      => Shutl::ResourceGone,
-        422      => Shutl::ResourceInvalid,
         503      => Shutl::ServiceUnavailable,
         501..502 => Shutl::ServerError,
         504..599 => Shutl::ServerError
@@ -112,6 +141,7 @@ describe Shutl::Resource::Rest do
         end
       end
 
+
       it 'should add a id based on the resource id' do
         resource = TestRest.find('a')
 
@@ -124,9 +154,9 @@ describe Shutl::Resource::Rest do
         to_return(:status  => 200, :body => '{"test_rest": {}}',
                   :headers => headers)
 
-      TestRest.find('new resource')
+        TestRest.find('new resource')
 
-      request.should have_been_requested
+        request.should have_been_requested
     end
 
     context 'with url arguments' do
@@ -299,9 +329,9 @@ describe Shutl::Resource::Rest do
         with(body:    '{"test_rest":{"a":"a","b":"b"}}',
              headers: headers)
 
-      TestRest.create(a: 'a', b: 'b')
+        TestRest.create(a: 'a', b: 'b')
 
-      request.should have_been_requested
+        request.should have_been_requested
     end
 
   end
