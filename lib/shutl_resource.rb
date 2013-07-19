@@ -10,7 +10,7 @@ require 'shutl/resource/errors'
 module Shutl::Resource
   extend self
 
-  delegate :logger, :logger=, to: Configuration
+  delegate :logger, :logger=, :base_uri, :base_uri=, to: Configuration
 
   def configure(*args, &block)
     Configuration.configure(*args, &block)

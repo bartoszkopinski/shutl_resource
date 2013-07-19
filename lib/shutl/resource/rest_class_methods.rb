@@ -271,6 +271,8 @@ module Shutl::Resource
     def generate_url!(url_pattern, args, params = {})
       url = url_pattern.dup
 
+      url = "#{Shutl::Resource.base_uri}#{url}" unless self.base_uri
+
       args, url = replace_args_from_pattern! args, url
 
       url = URI.escape url
