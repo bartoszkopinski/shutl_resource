@@ -28,18 +28,10 @@ module Shutl::Resource
 
   module Configuration
     class << self
-      attr_accessor :base_uri
+      attr_accessor :base_uri, :logging_enabled
 
       def configure
         yield self
-      end
-
-      def logger
-        @logger ||= Logger.new($stdout)
-      end
-
-      def logger=(logger)
-        @logger = logger
       end
     end
   end
