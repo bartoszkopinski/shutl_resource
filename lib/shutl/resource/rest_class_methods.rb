@@ -12,7 +12,10 @@ module Shutl::Resource
         # faraday.ssl[:ca_file] = ENV["SSL_CERT_FILE"]
 
         faraday.adapter Faraday.default_adapter # make requests with Net::HTTP
-        faraday.use :extended_logging, logger: Shutl::Resource.logger
+
+        if Shutl::Resource.logger
+          faraday.use :extended_logging, logger: Shutl::Resource.logger
+        end
       end
     end
 
