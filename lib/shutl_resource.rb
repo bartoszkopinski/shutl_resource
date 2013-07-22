@@ -5,6 +5,7 @@ require 'faraday'
 require 'faraday_middleware'
 
 require 'shutl_auth'
+require 'shutl/resource/version'
 require 'shutl/resource/configuration'
 require 'shutl/resource/rest'
 require 'shutl/resource/rest_class_methods'
