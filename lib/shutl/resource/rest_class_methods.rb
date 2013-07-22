@@ -7,7 +7,7 @@ module Shutl::Resource
     def connection
       @connection ||= Faraday.new(:url => @base_uri || Shutl::Resource.base_uri) do |faraday|
         faraday.request :url_encoded # form-encode POST params
-        faraday.response :logger if Shutl::Resource.logging_enabled
+        faraday.use :extended_logger, logger: Shutl::Resource.logger if Shutl::Resource.logger
         faraday.response :json
 
         # faraday.ssl[:ca_file] = ENV["SSL_CERT_FILE"]
