@@ -23,6 +23,7 @@ Gem::Specification.new do |gem|
   gem.add_dependency 'activemodel'
   gem.add_dependency 'faraday'
   gem.add_dependency 'faraday_middleware'
+  gem.add_dependency 'faraday-conductivity'
 
   gem.add_development_dependency 'rake'
   gem.add_development_dependency 'rspec', '~> 2.11.0'
