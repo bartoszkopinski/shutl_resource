@@ -1,3 +1,4 @@
+require 'open-uri'
 module Shutl::Resource
   module RestClassMethods
     def base_uri uri
@@ -312,8 +313,9 @@ module Shutl::Resource
 
       url = URI.escape url
       unless params.empty?
-        url += '?'
-        params.each { |key, value| url += "#{key}=#{value}&" }
+        url += '?' + params.entries.map do |key, value|
+          URI::encode "#{key}=#{value}"
+        end.join("&")
       end
       url
     end
