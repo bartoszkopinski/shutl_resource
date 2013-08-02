@@ -1,33 +1,6 @@
 require 'open-uri'
 module Shutl::Resource
   module RestClassMethods
-    def base_uri uri
-      @base_uri = uri
-    end
-
-    def connection
-      @connection ||= Faraday.new(:url => @base_uri || Shutl::Resource.base_uri) do |faraday|
-        faraday.request :url_encoded # form-encode POST params
-        faraday.response :json
-
-        # faraday.ssl[:ca_file] = ENV["SSL_CERT_FILE"]
-
-        faraday.adapter Faraday.default_adapter # make requests with Net::HTTP
-
-        if Shutl::Resource.logger
-          faraday.use :extended_logging, logger: Shutl::Resource.logger
-        end
-      end
-    end
-
-    def headers
-      {
-        'Accept'        => 'application/json',
-        'Content-Type'  => 'application/json',
-        'User-Agent'    => "Shutl Resource Gem v#{Shutl::Resource::VERSION}"
-      }
-    end
-
     def find(args = {}, params = {})
       params = args if @singular_resource
       auth_options = { auth: params.delete(:auth), from: params.delete(:from) }
@@ -42,13 +15,13 @@ module Shutl::Resource
         url = member_url args.dup, params
       end
 
-      response     = connection.get(url) do |req|
-        req.headers = headers_with_auth(auth_options)
-      end
+      response     = get url, headers_with_auth(auth_options)
 
       check_fail response, "Failed to find #{name}! args: #{args}, params: #{params}"
 
-      including_parent_attributes = response.body[@resource_name].merge args
+      parsed = response.parsed_response
+
+      including_parent_attributes = parsed[@resource_name].merge args
       new_object including_parent_attributes, response
     end
 
@@ -56,41 +29,40 @@ module Shutl::Resource
       url = generate_collection_url attributes
       attributes.delete "response"
 
-      response = connection.post(url) do |req|
-        req.headers = headers_with_auth(options)
-        req.body = { @resource_name => attributes }.to_json
-      end
+      response = post(
+        url,
+        { body: { @resource_name => attributes }.to_json }.merge(headers_with_auth(options))
+      )
 
       check_fail response, "Create failed"
 
-      parsed     = response.body || {}
+      parsed     = response.parsed_response || {}
       attributes = parsed[@resource_name] || {}
 
       new_object attributes, response
     end
 
     def destroy instance, options = {}
-      failure_message = "Failed to destroy #{name.downcase.pluralize}"
+      message = "Failed to destroy #{name.downcase.pluralize}"
 
       perform_action(
         instance,
         :delete,
-        {},
         headers_with_auth(options),
-        failure_message
+        message
       ).success?
     end
 
     def save instance, options = {}
+      #TODO: this is sometimes a hash and sometimes a Rest - need to rethink this
       attributes = instance.attributes rescue instance
 
-      body = { @resource_name => convert_new_id(attributes) }.to_json
+      payload = {
+        body: { @resource_name => convert_new_id(attributes) }.to_json
+      }
 
-      response = perform_action(instance,
-                                :put,
-                                body,
-                                headers_with_auth(options),
-                                "Save failed")
+      payload_with_headers = payload.merge(headers_with_auth options)
+      response             = perform_action(instance, :put, payload, "Save failed")
 
       response.success?
     end
@@ -108,13 +80,11 @@ module Shutl::Resource
       params   = partition.last.inject({}) { |h, pair| h[pair.first] = pair.last; h }
 
       url      = generate_collection_url url_args, params
-      response = connection.get(url) do |req|
-        req.headers = headers_with_auth(auth_options)
-      end
+      response = get url, headers_with_auth(auth_options)
 
       check_fail response, "Failed to find all #{name.downcase.pluralize}"
 
-      response_object = response.body[@resource_name.pluralize].map do |h|
+      response_object = response.parsed_response[@resource_name.pluralize].map do |h|
         new_object(args.merge(h), response)
       end
       if order_collection?
@@ -125,7 +95,7 @@ module Shutl::Resource
         end
       end
 
-      RestCollection.new(response_object, response.body['pagination'])
+      RestCollection.new(response_object, response.parsed_response['pagination'])
     end
 
     class RestCollection
@@ -235,17 +205,15 @@ module Shutl::Resource
         h['Authorization'] = "Bearer #{options[:auth]}" if options[:auth]
         h['From'] = "#{options[:from]}" if options[:from]
       end
+      { headers: headers }
     end
 
-    def perform_action instance, verb, body, headers, failure_message
+    def perform_action instance, verb, args, failure_message
       attributes = instance.is_a?(Hash) ? instance : instance.attributes
       attributes.delete "response" #used in debugging requests/responses
 
       url      = member_url attributes
-      response = connection.send(verb, url) do |req|
-        req.headers = headers
-        req.body = body
-      end
+      response = send verb, url, args
 
       check_fail response, failure_message
 
@@ -256,7 +224,7 @@ module Shutl::Resource
       instance = new add_resource_id_to(args), response
 
       instance.tap do |i|
-        parsed_response = response.body
+        parsed_response = response.parsed_response
 
         if errors = (parsed_response and parsed_response["errors"])
           i.errors = errors
@@ -265,7 +233,8 @@ module Shutl::Resource
     end
 
     def check_fail response, message
-      failure_klass = case response.status
+      c             = response.code
+      failure_klass = case c
                       when 299
                         if Shutl::Resource.raise_exceptions_on_no_quotes_generated
                           Shutl::NoQuotesGenerated
@@ -296,7 +265,7 @@ module Shutl::Resource
 
 
       output = begin
-                 response.body["errors"]["base"]
+                 response.parsed_response["errors"]["base"]
                rescue
                  message
                end
@@ -308,6 +277,8 @@ module Shutl::Resource
 
     def generate_url!(url_pattern, args, params = {})
       url = url_pattern.dup
+
+      url = "#{Shutl::Resource.base_uri}#{url}" unless self.base_uri
 
       args, url = replace_args_from_pattern! args, url
 

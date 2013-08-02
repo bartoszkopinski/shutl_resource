@@ -2,9 +2,14 @@ require 'spec_helper'
 
 describe Shutl::Resource::Rest do
   let(:headers) do
-    { 'Accept' => 'application/json',
-      'Content-Type' => 'application/json',
-      'User-Agent' => "Shutl Resource Gem v#{Shutl::Resource::VERSION}" }
+    { 'Accept' => 'application/json', 'Content-Type' => 'application/json' }
+  end
+
+  it 'should include the REST verb' do
+    TestRest.should respond_to :get
+    TestRest.should respond_to :post
+    TestRest.should respond_to :post
+    TestRest.should respond_to :delete
   end
 
   let(:resource) { TestRest.new(a: 'a', b: 2) }

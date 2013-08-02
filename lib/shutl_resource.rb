@@ -1,10 +1,6 @@
 module Shutl
 end
 
-require 'faraday'
-require 'faraday_middleware'
-require "faraday/conductivity"
-
 require 'shutl_auth'
 require 'shutl/resource/version'
 require 'shutl/resource/configuration'

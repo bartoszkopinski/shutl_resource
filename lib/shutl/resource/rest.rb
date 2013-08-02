@@ -14,7 +14,13 @@ module Shutl::Resource
     attr_reader :response
 
     def self.included(base)
+      base.send :include, HTTParty
       base.send :extend,  Shutl::Resource::RestClassMethods
+
+      base.send :headers, {
+        'Accept'        => 'application/json',
+        'Content-Type'  => 'application/json'
+      }
 
       base.send :resource_name, base.name.split('::').last.underscore
       base.send :resource_id,   :id
