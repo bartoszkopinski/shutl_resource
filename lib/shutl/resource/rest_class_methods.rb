@@ -13,7 +13,7 @@ module Shutl::Resource
         faraday.adapter Faraday.default_adapter # make requests with Net::HTTP
 
         if Shutl::Resource.logger
-          faraday.use :extended_logging, logger: Shutl::Resource.logger
+          faraday.use :default_logger, logger: Shutl::Resource.logger
         end
       end
     end
