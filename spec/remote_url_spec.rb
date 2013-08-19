@@ -81,7 +81,7 @@ describe Shutl::Resource::Rest do
       end
 
       it 'should support the params with invalid uri name' do
-        request = stub_request(:get, 'http://host/nested/10/resources?arg1=val1&arg%202=val2').
+        request = stub_request(:get, 'http://host/nested/10/resources?arg1=val1&arg%2B2=val2').
           to_return(body: '{"nested_resources": []}', headers: headers)
 
         NestedResource.all(parent_id: 10, arg1: 'val1', :'arg 2' => 'val2')
