@@ -10,8 +10,6 @@ module Shutl::Resource
         faraday.request :url_encoded # form-encode POST params
         faraday.response :json
 
-        # faraday.ssl[:ca_file] = ENV["SSL_CERT_FILE"]
-
         faraday.adapter Faraday.default_adapter # make requests with Net::HTTP
 
         if Shutl::Resource.logger
@@ -75,7 +73,7 @@ module Shutl::Resource
       perform_action(
         instance,
         :delete,
-        {},
+        {}.to_json,
         headers_with_auth(options),
         failure_message
       ).success?
