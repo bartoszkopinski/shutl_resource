@@ -65,11 +65,23 @@ module Shutl::Resource
     end
 
     def parsed
-      response.parsed_response
+      @parsed ||= response.body.with_indifferent_access
     end
 
     def status
       response.code
+    end
+
+    def pagination
+      parsed[:pagination]
+    end
+
+    def next_resource
+      pagination[:next_resource] if pagination
+    end
+
+    def previous_resource
+      pagination[:previous_resource] if pagination
     end
 
     attr_accessor :errors

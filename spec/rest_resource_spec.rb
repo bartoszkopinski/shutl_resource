@@ -44,6 +44,52 @@ describe Shutl::Resource::Rest do
       end
     end
 
+    context 'pagination' do
+      let(:body) do
+        {
+          test_rest: { a: "a", b: 2 },
+          pagination: pagination
+        }.to_json
+      end
+      let(:pagination) { {previous_resource: 1, next_resource: 3} }
+
+      before do
+        @request = stub_request(:get, 'http://host/test_rests/a').
+          to_return(:status => 200, :body => body, :headers => headers)
+      end
+
+      context 'both present' do
+        specify do
+          resource = TestRest.find('a', auth: "some auth")
+          resource.previous_resource.should == 1
+          resource.next_resource    .should == 3
+        end
+      end
+
+      context 'one present' do
+        let(:pagination) { {next_resource: 3} }
+        specify do
+          resource = TestRest.find('a', auth: "some auth")
+          resource.previous_resource.should be_nil
+          resource.next_resource    .should == 3
+        end
+      end
+
+      context 'none present' do
+        let(:body) do
+          {
+            test_rest: { a: "a", b: 2 }
+          }.to_json
+        end
+        specify do
+          resource = TestRest.find('a', auth: "some auth")
+          resource.pagination       .should be_nil
+          resource.previous_resource.should be_nil
+          resource.next_resource    .should be_nil
+        end
+      end
+    end
+
     context 'with no arguments' do
       let(:headers_with_auth) do
         headers.merge("Authorization" => "Bearer some auth")
