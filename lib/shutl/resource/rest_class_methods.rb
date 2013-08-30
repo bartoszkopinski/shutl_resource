@@ -47,7 +47,7 @@ module Shutl::Resource
       check_fail response, "Failed to find #{name}! args: #{args}, params: #{params}"
 
       including_parent_attributes = response.body[@resource_name].merge args
-      new_object including_parent_attributes, response
+      new_object including_parent_attributes, response.body
     end
 
     def create attributes = {}, options = {}
@@ -61,10 +61,10 @@ module Shutl::Resource
 
       check_fail response, "Create failed"
 
-      parsed     = response.body || {}
-      attributes = parsed[@resource_name] || {}
+      body     = response.body || {}
+      attributes = body[@resource_name] || {}
 
-      new_object attributes, response
+      new_object attributes, body
     end
 
     def destroy instance, options = {}
@@ -113,7 +113,7 @@ module Shutl::Resource
       check_fail response, "Failed to find all #{name.downcase.pluralize}"
 
       response_object = response.body[@resource_name.pluralize].map do |h|
-        new_object(args.merge(h), response)
+        new_object(args.merge(h), response.body)
       end
       if order_collection?
         response_object.sort! do |a,b|
@@ -240,6 +240,7 @@ module Shutl::Resource
       attributes.delete "response" #used in debugging requests/responses
 
       url      = member_url attributes
+
       response = connection.send(verb, url) do |req|
         req.headers = headers
         req.body = body
@@ -250,57 +251,56 @@ module Shutl::Resource
       response
     end
 
-    def new_object(args={}, response=nil)
-      instance = new add_resource_id_to(args), response
+    def new_object(args={}, body)
+      instance = new add_resource_id_to(args)
 
       instance.tap do |i|
-        parsed_response = response.body
-
-        if errors = (parsed_response and parsed_response["errors"])
-          i.errors = errors
-        end
+        i.errors     = body["errors"]
+        i.pagination = body["pagination"]
       end
     end
 
     def check_fail response, message
-      failure_klass = case response.status
-                      when 299
-                        if Shutl::Resource.raise_exceptions_on_no_quotes_generated
-                          Shutl::NoQuotesGenerated
-                        else
-                          nil
-                        end
-
-                      when 400 then Shutl::BadRequest
-                      when 401 then Shutl::UnauthorizedAccess
-                      when 403 then Shutl::ForbiddenAccess
-                      when 404 then Shutl::ResourceNotFound
-                      when 409 then Shutl::ResourceConflict
-                      when 410 then Shutl::ResourceGone
-                      when 422
-                        if Shutl::Resource.raise_exceptions_on_validation
-                          Shutl::ResourceInvalid
-                        else
-                          nil #handled as validation failure
-                        end
-
-                      when 411..499
-                        Shutl::BadRequest
-                      when 500 then Shutl::ServerError
-                      when 503 then Shutl::ServiceUnavailable
-                      when 501..Float::INFINITY
-                        Shutl::ServerError
-                      end
-
-      if failure_klass
-        body = if response.headers["content-type"] == "application/json"
+      if klass = failure_klass(response.status)
+        body = if response.headers["content-type"] =~ %r{application/json}
                  response.body
                else
                  {debug_info: response.body}
                end
 
 
-        raise failure_klass.new body, response.status
+        raise klass.new body, response.status
+      end
+    end
+
+    def failure_klass(status)
+      case status
+      when 299
+        if Shutl::Resource.raise_exceptions_on_no_quotes_generated
+          Shutl::NoQuotesGenerated
+        else
+          nil
+        end
+
+      when 400 then Shutl::BadRequest
+      when 401 then Shutl::UnauthorizedAccess
+      when 403 then Shutl::ForbiddenAccess
+      when 404 then Shutl::ResourceNotFound
+      when 409 then Shutl::ResourceConflict
+      when 410 then Shutl::ResourceGone
+      when 422
+        if Shutl::Resource.raise_exceptions_on_validation
+          Shutl::ResourceInvalid
+        else
+          nil #handled as validation failure
+        end
+
+      when 411..499
+        Shutl::BadRequest
+      when 500 then Shutl::ServerError
+      when 503 then Shutl::ServiceUnavailable
+      when 501..Float::INFINITY
+        Shutl::ServerError
       end
     end
 

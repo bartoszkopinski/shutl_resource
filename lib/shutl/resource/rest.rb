@@ -1,4 +1,3 @@
-require 'httparty'
 require 'active_support/core_ext/string'
 require 'active_support/core_ext/hash'
 require 'active_support/inflector'
@@ -8,10 +7,9 @@ require 'active_model'
 
 module Shutl::Resource
   module Rest
-    extend HTTParty
     include ActiveModel::Serialization
 
-    attr_reader :response
+    attr_accessor :pagination, :errors
 
     def self.included(base)
       base.send :extend,  Shutl::Resource::RestClassMethods
@@ -20,9 +18,8 @@ module Shutl::Resource
       base.send :resource_id,   :id
     end
 
-    def initialize(args = {}, response=nil)
+    def initialize(args = {})
       update_attributes args
-      @response = response
     end
 
     def as_json(_)
@@ -64,27 +61,14 @@ module Shutl::Resource
       self.instance_variables.include?(:"@#{method}") ? true : super
     end
 
-    def parsed
-      @parsed ||= response.body.with_indifferent_access
-    end
-
-    def status
-      response.code
-    end
-
-    def pagination
-      parsed[:pagination]
-    end
 
     def next_resource
-      pagination[:next_resource] if pagination
+      pagination["next_resource"] if pagination
     end
 
     def previous_resource
-      pagination[:previous_resource] if pagination
+      pagination["previous_resource"] if pagination
     end
-
-    attr_accessor :errors
 
     def valid?
       errors.blank?
@@ -95,15 +79,9 @@ module Shutl::Resource
     end
 
     def attributes
-      (instance_variables - [:@response]).inject({}.with_indifferent_access) do |h, var|
+      (instance_variables).inject({}.with_indifferent_access) do |h, var|
         h.merge( { var.to_s.gsub('@','').to_sym => instance_variable_get(var)})
       end
-    end
-
-    private
-
-    def check_fail *args
-      self.class.send :check_fail, *args
     end
 
     protected

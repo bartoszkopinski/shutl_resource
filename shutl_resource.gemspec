@@ -18,7 +18,6 @@ Gem::Specification.new do |gem|
   gem.require_paths = ["lib"]
   gem.version       = Shutl::Resource::VERSION
 
-  gem.add_dependency 'httparty', '~> 0.10.0'
   gem.add_dependency 'shutl_auth', '0.8.0'
   gem.add_dependency 'activemodel'
   gem.add_dependency 'faraday'

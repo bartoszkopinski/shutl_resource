@@ -55,7 +55,7 @@ describe Shutl::Resource::Rest do
 
       before do
         @request = stub_request(:get, 'http://host/test_rests/a').
-          to_return(:status => 200, :body => body, :headers => headers)
+          to_return(status: 200, body: body, headers: headers)
       end
 
       context 'both present' do
@@ -311,6 +311,7 @@ describe Shutl::Resource::Rest do
       after do
         Shutl::Resource.raise_exceptions_on_validation = true
       end
+
       specify do
         errors = { "base" => "invalid", "some_field" => "some field is invalid" }
         body   = { "errors" => errors }.to_json
@@ -337,7 +338,7 @@ describe Shutl::Resource::Rest do
 
     def stub_post status
       stub_request(:post, 'http://host/test_rests').
-        to_return(:status => status, :body => '', :headers => headers)
+        to_return(:status => status, :body => '{}', :headers => headers)
     end
 
     it 'should raise error if the remote server returns an error' do
@@ -350,7 +351,7 @@ describe Shutl::Resource::Rest do
 
     it 'should post the header content-type: json' do
       request = stub_request(:post, 'http://host/test_rests').
-        with(:body => "{\"test_rest\":{}}", :headers => headers)
+        with(:body => '{"test_rest":{}}', :headers => headers)
 
       TestRest.create
 
