@@ -8,13 +8,14 @@ module Shutl::Resource
     def connection
       @connection ||= Faraday.new(:url => @base_uri || Shutl::Resource.base_uri) do |faraday|
         faraday.request :url_encoded # form-encode POST params
-        faraday.response :json
 
-        faraday.adapter Faraday.default_adapter # make requests with Net::HTTP
 
         if Shutl::Resource.logger
           faraday.use :default_logger, logger: Shutl::Resource.logger
         end
+
+        faraday.response :json
+        faraday.adapter Faraday.default_adapter # make requests with Net::HTTP
       end
     end
 
