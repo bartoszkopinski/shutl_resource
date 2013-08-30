@@ -1,5 +1,4 @@
 require 'forwardable'
-require 'awesome_print'
 
 module Faraday
   class Middleware
