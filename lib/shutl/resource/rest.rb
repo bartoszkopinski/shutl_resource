@@ -79,7 +79,7 @@ module Shutl::Resource
     end
 
     def attributes
-      (instance_variables).inject({}.with_indifferent_access) do |h, var|
+      (instance_variables- [:@errors, :@pagination]).inject({}.with_indifferent_access) do |h, var|
         h.merge( { var.to_s.gsub('@','').to_sym => instance_variable_get(var)})
       end
     end
