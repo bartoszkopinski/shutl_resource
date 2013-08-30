@@ -39,14 +39,17 @@ module Faraday
       end
 
       def request_debug(env)
-        request_headers = strip_auth env[:request_headers]
+        request_headers = obfuscate_auth env[:request_headers]
 
         debug_message("Request", request_headers, env[:body])
       end
 
-      def strip_auth(headers)
+      def obfuscate_auth(headers)
         headers.dup.tap do |h|
-          h["Authorization"] = h["Authorization"][0..3] << "***" << h["Authorization"][-4..-1]
+          if auth = h["Authorization"]
+            #display first few and last few characters
+            h["Authorization"] = "#{auth[0..10]}****#{auth[-4..-1]}"
+          end
         end
       end
 
