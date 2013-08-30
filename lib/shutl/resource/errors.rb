@@ -1,10 +1,8 @@
 class Shutl::Resource::Error < ::IOError
-  attr_reader :response
+  attr_reader :body, :status
 
-  def initialize message, http_response
-    @response = http_response
-
-    super message #it really is rather spot on, why thanks for saying, kind sir.
+  def initialize body, status
+    @body, @status = body, status
   end
 end
 

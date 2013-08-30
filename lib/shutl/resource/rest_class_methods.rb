@@ -292,14 +292,16 @@ module Shutl::Resource
                         Shutl::ServerError
                       end
 
-
-      output = begin
-                 response.body["errors"]["base"]
-               rescue
-                 message
+      if failure_klass
+        body = if response.headers["content-type"] == "application/json"
+                 response.body
+               else
+                 {debug_info: response.body}
                end
 
-      raise failure_klass.new output, response if failure_klass
+
+        raise failure_klass.new body, response.status
+      end
     end
 
     protected
