@@ -2,9 +2,9 @@ require 'spec_helper'
 
 describe Shutl::Resource::Rest do
   let(:headers) do
-    { 'Accept' => 'application/json',
+    { 'Accept'       => 'application/json',
       'Content-Type' => 'application/json',
-      'User-Agent' => "Shutl Resource Gem v#{Shutl::Resource::VERSION}" }
+      'User-Agent'   => "Shutl Resource Gem v#{Shutl::Resource::VERSION}" }
   end
 
   let(:resource) { TestRest.new(a: 'a', b: 2) }
@@ -12,9 +12,6 @@ describe Shutl::Resource::Rest do
   describe '#find' do
     context "with a singular resource" do
       let(:resource) { TestSingularResource.new }
-      let(:headers_with_auth) do
-        headers.merge("Authorization" => "Bearer some auth")
-      end
 
       before do
         @request = stub_request(:get, 'http://host/test_singular_resource').
@@ -25,7 +22,6 @@ describe Shutl::Resource::Rest do
 
       it 'queries the endpoint' do
         TestSingularResource.find(auth: "some auth")
-
         @request.should have_been_requested
       end
 

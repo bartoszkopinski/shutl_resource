@@ -4,8 +4,8 @@ require File.expand_path('../lib/shutl/resource/version', __FILE__)
 $platform ||= RUBY_PLATFORM[/java/] || 'ruby'
 
 Gem::Specification.new do |gem|
-  gem.authors       = ["David Rouchy", "Volker Pacher", "Mark Burns"]
-  gem.email         = ["davidr@shutl.co.uk", "volker@shutl.com", "mark@shutl.com"]
+  gem.authors       = ["David Rouchy", "Volker Pacher", "Mark Burns", "Cosimo Ranieri"]
+  gem.email         = ["davidr@shutl.co.uk", "volker@shutl.com", "mark@shutl.com", "cosimo@shutl.com"]
   gem.description   = %q{Shutl Rest resource}
   gem.summary       = %q{Manage Shutl Rest resource. Parse/Serialize JSON}
   gem.homepage      = ""
