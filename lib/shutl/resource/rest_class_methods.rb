@@ -19,25 +19,9 @@ module Shutl::Resource
       end
     end
 
-    def headers
-      {
-        'Accept'        => 'application/json',
-        'Content-Type'  => 'application/json',
-        'User-Agent'    => "Shutl Resource Gem v#{Shutl::Resource::VERSION}"
-      }
-    end
-    
-    def header_options params
-      header_opts = params[:headers] || {}
-      header_opts.merge!(authorization: params[:auth]) if params[:auth] 
-      header_opts.merge!(from: params[:from])          if params[:from]
-      header_opts
-    end
-
     def find(args = {}, params = {})
       params = args if @singular_resource
 
-      
       if @singular_resource
         url    = singular_member_url params
       elsif !args.kind_of?(Hash)
@@ -234,6 +218,23 @@ module Shutl::Resource
 
 
     private
+
+
+    def headers
+      {
+        'Accept'        => 'application/json',
+        'Content-Type'  => 'application/json',
+        'User-Agent'    => "Shutl Resource Gem v#{Shutl::Resource::VERSION}"
+      }
+    end
+    
+    def header_options params
+      header_opts = params[:headers] || {}
+      header_opts.merge!(authorization: params[:auth]) if params[:auth] 
+      header_opts.merge!(from: params[:from])          if params[:from]
+      header_opts
+    end
+
 
     def generate_request_header header_options = {}
       header_options.inject(headers) do |h, (k,v)|
