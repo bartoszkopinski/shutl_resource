@@ -230,8 +230,8 @@ module Shutl::Resource
     
     def header_options params
       header_opts = params[:headers] || {}
-      header_opts.merge!(authorization: params[:auth]) if params[:auth] 
-      header_opts.merge!(from: params[:from])          if params[:from]
+      header_opts.merge!(authorization: "Bearer #{params[:auth]}") if params[:auth] 
+      header_opts.merge!(from: params[:from])                      if params[:from]
       header_opts
     end
 
