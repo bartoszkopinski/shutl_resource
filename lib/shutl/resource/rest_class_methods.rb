@@ -31,7 +31,6 @@ module Shutl::Resource
       else
         url = member_url args.dup, params
       end
-
       response     = connection.get(url) do |req|
         req.headers = generate_request_header(header_options(params))
       end

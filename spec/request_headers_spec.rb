@@ -31,6 +31,32 @@ describe Shutl::Resource::Rest do
     }
   }
 
+  describe 'prepends Bearer if auth is passed in for authorization' do
+    let(:resource) { TestSingularResource.new }
+    let(:expected_headers) {
+      {
+        'Accept'                => 'application/json', 
+        'Accept-Encoding'       => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 
+        'Authorization'         => 'Bearer some_auth',
+        'Content-Type'          => 'application/json',
+        'User-Agent'            => "Shutl Resource Gem v#{Shutl::Resource::VERSION}",
+      }
+    }
+    before do
+      @request = stub_request(:get, 'http://host/test_singular_resource')
+                 .with(expected_headers)
+                 .to_return(:status  => 200,
+                            :body    => '{"test_singular_resource": { "a": "a", "b": 2 }}',
+                            :headers => response_headers)
+    end
+    it 'queries the endpoint' do
+      TestSingularResource.find(auth: "some_auth")
+      @request.should have_been_requested
+    end
+
+  end
+
+
   describe '#find' do
     context "with a singular resource" do
       let(:resource) { TestSingularResource.new }
