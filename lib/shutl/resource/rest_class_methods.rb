@@ -19,17 +19,8 @@ module Shutl::Resource
       end
     end
 
-    def headers
-      {
-        'Accept'        => 'application/json',
-        'Content-Type'  => 'application/json',
-        'User-Agent'    => "Shutl Resource Gem v#{Shutl::Resource::VERSION}"
-      }
-    end
-
     def find(args = {}, params = {})
       params = args if @singular_resource
-      auth_options = { auth: params.delete(:auth), from: params.delete(:from) }
 
       if @singular_resource
         url    = singular_member_url params
@@ -42,7 +33,7 @@ module Shutl::Resource
       end
 
       response     = connection.get(url) do |req|
-        req.headers = headers_with_auth(auth_options)
+        req.headers = generate_request_header(header_options(params))
       end
 
       check_fail response, "Failed to find #{name}! args: #{args}, params: #{params}"
@@ -56,7 +47,7 @@ module Shutl::Resource
       attributes.delete "response"
 
       response = connection.post(url) do |req|
-        req.headers = headers_with_auth(options)
+        req.headers = generate_request_header(header_options(options))
         req.body = { @resource_name => attributes }.to_json
       end
 
@@ -75,7 +66,7 @@ module Shutl::Resource
         instance,
         :delete,
         {}.to_json,
-        headers_with_auth(options),
+        generate_request_header(header_options(options)),
         failure_message
       ).success?
     end
@@ -88,7 +79,7 @@ module Shutl::Resource
       response = perform_action(instance,
                                 :put,
                                 body,
-                                headers_with_auth(options),
+                                generate_request_header(header_options(options)),
                                 "Save failed")
 
       response.success?
@@ -100,7 +91,6 @@ module Shutl::Resource
 
 
     def all(args = {})
-      auth_options = { auth: args.delete(:auth), from: args.delete(:from) }
       partition    = args.partition { |key, value| !remote_collection_url.index(":#{key}").nil? }
 
       url_args = partition.first.inject({}) { |h, pair| h[pair.first] = pair.last; h }
@@ -108,7 +98,7 @@ module Shutl::Resource
 
       url      = generate_collection_url url_args, params
       response = connection.get(url) do |req|
-        req.headers = headers_with_auth(auth_options)
+        req.headers = generate_request_header(header_options(args))
       end
 
       check_fail response, "Failed to find all #{name.downcase.pluralize}"
@@ -229,10 +219,38 @@ module Shutl::Resource
 
     private
 
+
+    def headers
+      {
+        'Accept'        => 'application/json',
+        'Content-Type'  => 'application/json',
+        'User-Agent'    => "Shutl Resource Gem v#{Shutl::Resource::VERSION}"
+      }
+    end
+    
+    def header_options params
+      header_opts = params[:headers] || {}
+      header_opts.merge!(authorization: params[:auth]) if params[:auth] 
+      header_opts.merge!(from: params[:from])          if params[:from]
+      header_opts
+    end
+
+
+    def generate_request_header header_options = {}
+      header_options.inject(headers) do |h, (k,v)|
+        h[header_name(k.to_s)] = v if v
+        h
+      end
+    end
+
+    def header_name header_key 
+      header_key.split(%r{\_|\-}).map {|e| e.capitalize }.join("-")
+    end
+
     def headers_with_auth options = {}
       headers.tap do |h|
         h['Authorization'] = "Bearer #{options[:auth]}" if options[:auth]
-        h['From'] = "#{options[:from]}" if options[:from]
+        h['From']          = "#{options[:from]}" if options[:from]
       end
     end
 
@@ -313,6 +331,7 @@ module Shutl::Resource
       args, url = replace_args_from_pattern! args, url
 
       url = URI.escape url
+      params = params.except(:headers, :auth, :from)
       unless params.empty?
         url += '?' + params.entries.map do |key, value|
           URI::encode "#{key}=#{value}"

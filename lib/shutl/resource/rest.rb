@@ -36,10 +36,10 @@ module Shutl::Resource
       attrs.each { |a, v| instance_variable_set(:"@#{a}", v) }
     end
 
-    def update!(attrs)
+    def update!(attrs, headers = {})
       new_attributes = attributes.merge attrs
       update_attributes(self.class.add_resource_id_to new_attributes)
-      save
+      save(headers)
     end
 
     def save options={}
