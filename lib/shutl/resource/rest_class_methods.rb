@@ -246,13 +246,6 @@ module Shutl::Resource
       header_key.split(%r{\_|\-}).map {|e| e.capitalize }.join("-")
     end
 
-    def headers_with_auth options = {}
-      headers.tap do |h|
-        h['Authorization'] = "Bearer #{options[:auth]}" if options[:auth]
-        h['From']          = "#{options[:from]}" if options[:from]
-      end
-    end
-
     def perform_action instance, verb, body, headers, failure_message
       attributes = instance.is_a?(Hash) ? instance : instance.attributes
       attributes.delete "response" #used in debugging requests/responses
