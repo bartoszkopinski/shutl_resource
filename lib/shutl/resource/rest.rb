@@ -23,26 +23,26 @@ module Shutl::Resource
     end
 
     def as_json(_)
-      attributes
+      resource_attributes
     end
 
     def to_json(options = nil)
       {
-        :"#{prefix}" => attributes
+        :"#{prefix}" => resource_attributes
       }.to_json(options)
     end
 
     def update_attributes(attrs)
       attrs.each do |a, v|
-        unless String(a) == 'id' && attributes.include?('id')
+        unless String(a) == 'id' && resource_attributes.include?('id')
           a = 'id' if String(a) == 'new_id'
-          attributes.update String(a) => v
+          resource_attributes[String(a)] = v
         end
       end
     end
 
     def update!(attrs, headers = {})
-      new_attributes = attributes.merge attrs
+      new_attributes = resource_attributes.merge attrs
       update_attributes(self.class.add_resource_id_to new_attributes)
       save(headers)
     end
@@ -56,12 +56,13 @@ module Shutl::Resource
     end
 
     def method_missing(method, *args, &block)
-        return attributes[String(args.first)] if method.to_s == '[]'
-        attributes.fetch(String(method)) { super }
+        return resource_attributes['id'] if String(method) == 'id'
+        return resource_attributes[String(args.first)] if method.to_s == '[]'
+        resource_attributes.fetch(String(method)) { super }
     end
 
     def respond_to? method
-      attributes.has_key?(String(method)) ? true : super
+        resource_attributes.has_key?(String(method)) ? true : super
     end
 
     def next_resource
@@ -77,11 +78,18 @@ module Shutl::Resource
     end
 
     def resource_id
-      instance_variable_get :"@#{self.class.resource_id_name}"
+      self.instance_variable_get :"@#{self.class.resource_id_name}"
     end
 
     def attributes
-      @attributes ||= {}
+      resource_attributes
+    end
+
+    def resource_attributes
+      unless self.instance_variables.include?(:@resource_attributes)
+        self.instance_variable_set(:@resource_attributes, {})
+      end
+      self.instance_variable_get :@resource_attributes
     end
 
     protected

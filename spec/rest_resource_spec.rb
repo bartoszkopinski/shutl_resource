@@ -38,6 +38,10 @@ describe Shutl::Resource::Rest do
         resource.a.should == 'a'
         resource.b.should == 2
       end
+
+      it 'always responsd to id even if there is no attribute' do
+        resource.id.should be_nil
+      end
     end
 
     context 'pagination' do
@@ -480,5 +484,15 @@ describe Shutl::Resource::Rest do
       it 'does not responsd to a getter if there is no attributes' do
          subject.respond_to?(:foo).should be_false
       end
+    end
+
+    describe 'parses successfuly a quote' do
+      let(:attrs) do
+       {"id"=>"5283836fe4b074c20bb4f4e1-1384351475", "created_at"=>"2013-11-13T13:49+00:00", "valid_until"=>"2013-11-13T14:15+00:00", "basket_value"=>999, "distance"=>12.1, "total_weight"=>nil, "time_zone"=>"America/Chicago", "merchant"=>{"id"=>"ebay_us", "name"=>"eBay US", "shutl_account_number"=>"", "notify_updates"=>true, "notification_endpoint"=>"https://triton-alpha.ebay.com/delivery-events-qa/shutl", "hide_customer_phone_from_carrier"=>false}, "pickup_location"=>{"notes"=>"", "address"=>{"company_name"=>"eBay US", "name"=>"", "line_1"=>"929 W Belmont Ave", "line_2"=>"", "county_or_state"=>"IL", "city"=>"Chicago", "postcode"=>"60657", "country"=>"US"}, "contact"=>{"name"=>"eBay US", "email"=>"email@example.com", "phone"=>"+1 7734720500"}}, "delivery_location"=>{"address"=>{"company_name"=>"", "name"=>"Dean Chen", "line_1"=>"500 S Central Ave", "line_2"=>"", "county_or_state"=>"IL", "city"=>"Chicago", "postcode"=>"60644", "country"=>"US"}, "contact"=>{"name"=>"Dean Chen", "email"=>"zhuichen@ebay.com", "phone"=>"+1 7840536666"}}, "carrier"=>{"id"=>"united_express_systems", "name"=>"United Express Systems", "shutl_account_number"=>"", "time_zone"=>"America/Chicago", "booking_api"=>{"manual"=>false, "url"=>"http://localhost:5000", "client_key"=>"4B91C40C7480A75069790A69AE97A56A", "client_id"=>"674611e57f"}, "vehicle"=>{"id"=>"small_van", "name"=>"Small van", "reference"=>"MiniVan"}, "out_of_hours_notification"=>{}}, "times"=>{"pickup_start"=>"2013-11-13T14:15+00:00", "pickup_finish"=>"2013-11-13T17:00+00:00", "delivery_start"=>"2013-11-13T17:00+00:00", "delivery_finish"=>"2013-11-13T18:00+00:00", "delivery_sla_buffer"=>900, "sliding_amount"=>0}, "prices"=>{"merchant"=>3075, "customer"=>3075, "carrier"=>2563}, "products"=>[]}
+      end
+
+      subject { TestRest.new attrs }
+
+      its(:prices) { should_not be_empty }
     end
 end
