@@ -114,8 +114,8 @@ describe Shutl::Resource::Rest do
       it 'should assign the attributes based on the json returned' do
         resource = TestRest.find('a', auth: "some auth")
 
-        resource.instance_variable_get('@a').should == 'a'
-        resource.instance_variable_get('@b').should == 2
+        resource.attributes['a'].should == 'a'
+        resource.attributes['b'].should == 2
       end
 
       context "299" do
@@ -182,7 +182,7 @@ describe Shutl::Resource::Rest do
       it 'should add a id based on the resource id' do
         resource = TestRest.find('a')
 
-        resource.instance_variable_get('@id').should == 'a'
+        resource.attributes['id'].should == 'a'
       end
     end
 
@@ -241,8 +241,8 @@ describe Shutl::Resource::Rest do
       it 'should assign the attributes based on the json returned' do
         resource = TestRest.all
 
-        resource.first.instance_variable_get('@a').should == 'a'
-        resource.first.instance_variable_get('@b').should == 2
+        resource.first.attributes['a'].should == 'a'
+        resource.first.attributes['b'].should == 2
       end
 
       it 'should provide accessor to pagination' do

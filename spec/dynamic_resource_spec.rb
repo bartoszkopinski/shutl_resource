@@ -15,8 +15,8 @@ describe Shutl::Resource::Rest do
 
   describe '#initalize' do
     it 'should assign the instance variable value for the entries in the hash' do
-      resource.instance_variable_get(:@a).should == 'a'
-      resource.instance_variable_get(:@b).should == 'b'
+      resource.attributes['a'].should == 'a'
+      resource.attributes['b'].should == 'b'
     end
 
     it 'should create a attribute reader' do
@@ -55,8 +55,7 @@ describe Shutl::Resource::Rest do
     it 'should replace the attributes' do
       resource.update_attributes(a: 'c')
 
-      resource.instance_variable_get(:@a).should == 'c'
-
+      resource['a'].should == 'c'
     end
   end
 end

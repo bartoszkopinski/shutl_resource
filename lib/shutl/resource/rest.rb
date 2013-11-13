@@ -33,7 +33,12 @@ module Shutl::Resource
     end
 
     def update_attributes(attrs)
-      attrs.each { |a, v| instance_variable_set(:"@#{a}", v) }
+      attrs.each do |a, v|
+        unless String(a) == 'id' && attributes.include?('id')
+          a = 'id' if String(a) == 'new_id'
+          attributes.update String(a) => v
+        end
+      end
     end
 
     def update!(attrs, headers = {})
@@ -51,14 +56,12 @@ module Shutl::Resource
     end
 
     def method_missing(method, *args, &block)
-      if self.instance_variables.include?(:"@#{method}")
-        return self.instance_variable_get(:"@#{method}")
-      end
-      super
+        return attributes[String(args.first)] if method.to_s == '[]'
+        attributes.fetch(String(method)) { super }
     end
 
     def respond_to? method
-      self.instance_variables.include?(:"@#{method}") ? true : super
+      attributes.has_key?(method) ? true : super
     end
 
 
@@ -79,9 +82,7 @@ module Shutl::Resource
     end
 
     def attributes
-      (instance_variables- [:@errors, :@pagination]).inject({}.with_indifferent_access) do |h, var|
-        h.merge( { var.to_s.gsub('@','').to_sym => instance_variable_get(var)})
-      end
+      @attributes ||= {}
     end
 
     protected
