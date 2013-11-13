@@ -323,7 +323,7 @@ module Shutl::Resource
       args, url = replace_args_from_pattern! args, url
 
       url = URI.escape url
-      params = params.except(:headers, :auth, :from)
+      params = params.except(:headers, :auth, :from, 'headers', 'auth', 'from')
       unless params.empty?
         url += '?' + params.entries.map do |key, value|
           URI::encode "#{key}=#{value}"
