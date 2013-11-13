@@ -470,5 +470,15 @@ describe Shutl::Resource::Rest do
     end
   end
 
+    describe '#respond_to?' do
+      subject { TestRest.new a:1, b:2 }
 
+      it 'responds to a getter if it has an attribute' do
+        subject.respond_to?(:a).should be_true
+      end
+
+      it 'does not responsd to a getter if there is no attributes' do
+         subject.respond_to?(:foo).should be_false
+      end
+    end
 end

@@ -61,9 +61,8 @@ module Shutl::Resource
     end
 
     def respond_to? method
-      attributes.has_key?(method) ? true : super
+      attributes.has_key?(String(method)) ? true : super
     end
-
 
     def next_resource
       pagination["next_resource"] if pagination
