@@ -376,6 +376,41 @@ describe Shutl::Resource::Rest do
         request.should have_been_requested
     end
 
+    context "send user email address for Audit" do
+      let(:user_email) { 'user@example.com' }
+
+      before do
+        Shutl::Resource::RestClassMethods.from_user = user_email
+      end
+
+      it "should override the email with 'from' option" do
+        request = stub_request(:post, 'http://host/test_rests').with(headers: headers.merge(from: 'new@example.com')).to_return(:status => 200)
+        TestRest.create({}, from: 'new@example.com')     
+
+        request.should have_been_requested   
+      end
+
+      it "should be thread-safe" do
+        t1 = Thread.new do
+          sleep 0.5
+          Shutl::Resource::RestClassMethods.from_user = 'thread1 user'
+          stub_request(:post, 'http://host/test_rests').with(headers: headers.merge(from: 'thread1 user')).to_return(:status => 200)
+          TestRest.create     
+        end
+
+        t2 = Thread.new do
+          Shutl::Resource::RestClassMethods.from_user = 'thread2 user'
+          sleep 1
+          stub_request(:post, 'http://host/test_rests').with(headers: headers.merge(from: 'thread2 user')).to_return(:status => 200)
+          TestRest.create     
+        end
+
+        t1.join; t2.join
+
+        Thread.current[:user_email].should be user_email
+      end
+    end
+
   end
 
   describe '#destroy' do
@@ -471,6 +506,47 @@ describe Shutl::Resource::Rest do
       test_resource.update!(a: 'a', b: 'b', new_id: 'xxx')
 
       request.should have_been_requested
+    end
+
+    context "send user email address for Audit" do
+      let(:user_email) { 'user@example.com' }
+
+      before do
+        Shutl::Resource::RestClassMethods.from_user = user_email
+      end
+
+      it "should override the email with 'from' option" do
+        request = stub_request(:put, 'http://host/test_rests/a').with(body: anything, headers: headers.merge(from: 'new@example.com')).to_return(:status => 200)
+
+        test_resource = TestRest.new
+        test_resource.update!({a: 'a', b: 'b'}, {from: 'new@example.com'})
+
+        request.should have_been_requested   
+      end
+
+      it "should be thread-safe" do
+        t1 = Thread.new do
+          sleep 0.5
+          Shutl::Resource::RestClassMethods.from_user = 'thread1 user'
+          stub_request(:put, 'http://host/test_rests/a').with(body: anything, headers: headers.merge(from: 'thread1 user')).to_return(:status => 200)
+
+          test_resource = TestRest.new
+          test_resource.update!(a: 'a', b: 'b')
+        end
+
+        t2 = Thread.new do
+          Shutl::Resource::RestClassMethods.from_user = 'thread2 user'
+          sleep 1
+          stub_request(:put, 'http://host/test_rests/a').with(body: anything, headers: headers.merge(from: 'thread2 user')).to_return(:status => 200)
+
+          test_resource = TestRest.new
+          test_resource.update!(a: 'a', b: 'b')
+        end
+
+        t1.join; t2.join
+
+        Thread.current[:user_email].should be user_email
+      end
     end
   end
 

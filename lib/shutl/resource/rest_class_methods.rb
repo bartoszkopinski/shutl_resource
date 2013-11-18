@@ -1,6 +1,7 @@
 require 'open-uri'
 module Shutl::Resource
   module RestClassMethods
+
     def base_uri uri
       @base_uri = uri
     end
@@ -216,8 +217,11 @@ module Shutl::Resource
     end
 
 
-    private
+    def self.from_user= email
+      Thread.current[:user_email] = email
+    end
 
+    private
 
     def headers
       {
@@ -230,8 +234,12 @@ module Shutl::Resource
     def header_options params
       header_opts = params[:headers] || {}
       header_opts.merge!(authorization: "Bearer #{params[:auth]}") if params[:auth] 
-      header_opts.merge!(from: params[:from])                      if params[:from]
+      header_opts.merge!(from: current_user_email(params))         if current_user_email(params)
       header_opts
+    end
+
+    def current_user_email params
+      params[:from] || Thread.current[:user_email]
     end
 
 

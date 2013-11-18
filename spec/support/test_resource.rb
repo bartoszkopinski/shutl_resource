@@ -3,4 +3,3 @@ class TestRest
   base_uri 'http://host'
   resource_id :a
 end
-
