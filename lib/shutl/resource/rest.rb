@@ -22,14 +22,6 @@ module Shutl::Resource
       update_attributes args
     end
 
-    def self.set_user_email email
-      @configurred_user_email = email
-    end
-
-    def self.get_user_email
-      @configurred_user_email
-    end
-
     def as_json(_)
       resource_attributes
     end
