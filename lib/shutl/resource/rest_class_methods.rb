@@ -21,9 +21,8 @@ module Shutl::Resource
     end
 
     def find(args = {}, params = {})
-      params = args if @singular_resource
-
       if @singular_resource
+        params = args
         url    = singular_member_url params
       elsif !args.kind_of?(Hash)
         id   = args
@@ -196,8 +195,8 @@ module Shutl::Resource
       args
     end
 
-    def singular_member_url params={}
-      generate_url! "/#{@resource_name}", params
+    def singular_member_url params
+      generate_url! "/#{@resource_name}", {}, params
     end
 
     def member_url *args
@@ -230,10 +229,10 @@ module Shutl::Resource
         'User-Agent'    => "Shutl Resource Gem v#{Shutl::Resource::VERSION}"
       }
     end
-    
+
     def header_options params
       header_opts = params[:headers] || {}
-      header_opts.merge!(authorization: "Bearer #{params[:auth]}") if params[:auth] 
+      header_opts.merge!(authorization: "Bearer #{params[:auth]}") if params[:auth]
       header_opts.merge!(from: current_user_email(params))         if current_user_email(params)
       header_opts
     end
@@ -250,7 +249,7 @@ module Shutl::Resource
       end
     end
 
-    def header_name header_key 
+    def header_name header_key
       header_key.split(%r{\_|\-}).map {|e| e.capitalize }.join("-")
     end
 
