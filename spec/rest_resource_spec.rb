@@ -13,34 +13,54 @@ describe Shutl::Resource::Rest do
     context "with a singular resource" do
       let(:resource) { TestSingularResource.new }
 
-      before do
-        @request = stub_request(:get, 'http://host/test_singular_resource').
-          to_return(:status  => 200,
-                    :body    => '{"test_singular_resource": { "a": "a", "b": 2 }}',
-                    :headers => headers)
+      let(:response) do
+        {
+          status:  200,
+          body:    '{"test_singular_resource": { "a": "a", "b": 2 }}',
+          headers: headers
+        }
       end
 
-      it 'queries the endpoint' do
-        TestSingularResource.find(auth: "some auth")
-        @request.should have_been_requested
+      context 'without params' do
+        before do
+          @request = stub_request(:get, 'http://host/test_singular_resource').
+            with(headers: {'Authorization'=>'Bearer some auth'}).to_return(response)
+        end
+
+        it 'queries the endpoint' do
+          TestSingularResource.find(auth: "some auth")
+          @request.should have_been_requested
+        end
+
+        it 'should parse the result of the body to create an object' do
+          resource = TestSingularResource.find(auth: "some auth")
+
+          resource.should_not be_nil
+          resource.should be_kind_of TestSingularResource
+        end
+
+        it 'should assign the attributes based on the json returned' do
+          resource = TestSingularResource.find(auth: "some auth")
+
+          resource.a.should == 'a'
+          resource.b.should == 2
+        end
+
+        it 'always responsd to id even if there is no attribute' do
+          resource.id.should be_nil
+        end
       end
 
-      it 'should parse the result of the body to create an object' do
-        resource = TestSingularResource.find(auth: "some auth")
+      describe 'with params' do
+        before do
+          @request = stub_request(:get, 'http://host/test_singular_resource?param=value').
+            with(headers: {'Authorization'=>'Bearer some auth'}).to_return(response)
+        end
 
-        resource.should_not be_nil
-        resource.should be_kind_of TestSingularResource
-      end
-
-      it 'should assign the attributes based on the json returned' do
-        resource = TestSingularResource.find(auth: "some auth")
-
-        resource.a.should == 'a'
-        resource.b.should == 2
-      end
-
-      it 'always responsd to id even if there is no attribute' do
-        resource.id.should be_nil
+        it 'adds the params to the url' do
+          TestSingularResource.find(param: 'value', auth: 'some auth')
+          @request.should have_been_requested
+        end
       end
     end
 
@@ -385,9 +405,9 @@ describe Shutl::Resource::Rest do
 
       it "should override the email with 'from' option" do
         request = stub_request(:post, 'http://host/test_rests').with(headers: headers.merge(from: 'new@example.com')).to_return(:status => 200)
-        TestRest.create({}, from: 'new@example.com')     
+        TestRest.create({}, from: 'new@example.com')
 
-        request.should have_been_requested   
+        request.should have_been_requested
       end
 
       it "should be thread-safe" do
@@ -395,14 +415,14 @@ describe Shutl::Resource::Rest do
           sleep 0.5
           Shutl::Resource::RestClassMethods.from_user = 'thread1 user'
           stub_request(:post, 'http://host/test_rests').with(headers: headers.merge(from: 'thread1 user')).to_return(:status => 200)
-          TestRest.create     
+          TestRest.create
         end
 
         t2 = Thread.new do
           Shutl::Resource::RestClassMethods.from_user = 'thread2 user'
           sleep 1
           stub_request(:post, 'http://host/test_rests').with(headers: headers.merge(from: 'thread2 user')).to_return(:status => 200)
-          TestRest.create     
+          TestRest.create
         end
 
         t1.join; t2.join
@@ -521,7 +541,7 @@ describe Shutl::Resource::Rest do
         test_resource = TestRest.new
         test_resource.update!({a: 'a', b: 'b'}, {from: 'new@example.com'})
 
-        request.should have_been_requested   
+        request.should have_been_requested
       end
 
       it "should be thread-safe" do
