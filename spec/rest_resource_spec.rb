@@ -233,6 +233,18 @@ describe Shutl::Resource::Rest do
       end
 
     end
+
+    context 'with returned error' do
+      before do
+        @request = stub_request(:get, 'http://host/test_rests/a?arg1=val1&arg2=val2').
+          to_return(:status => 200, :body => '{"errors": { "base":["Bing::DistanceLookupError"] } }', :headers => headers)
+      end
+
+      it 'should contain the errors' do
+        resource = TestRest.find('a', arg1: 'val1', arg2: 'val2')
+        resource.errors.should == { 'base' => ["Bing::DistanceLookupError"]}
+      end
+    end
   end
 
   describe '#all' do

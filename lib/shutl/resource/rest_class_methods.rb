@@ -37,7 +37,8 @@ module Shutl::Resource
 
       check_fail response, "Failed to find #{name}! args: #{args}, params: #{params}"
 
-      including_parent_attributes = response.body[@resource_name].merge args
+      parent_attributes = response.body[@resource_name] || {}
+      including_parent_attributes = parent_attributes.merge args
       new_object including_parent_attributes, response.body
     end
 
