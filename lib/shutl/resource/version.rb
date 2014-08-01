@@ -1,5 +1,5 @@
 module Shutl
   module Resource
-    VERSION = '1.5.5'
+    VERSION = '1.6.0'
   end
 end

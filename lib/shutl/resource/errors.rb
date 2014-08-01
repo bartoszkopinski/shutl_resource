@@ -13,7 +13,6 @@ end
 unless Shutl.const_defined?('NoQuotesGenerated')
   Shutl::NoQuotesGenerated  = Class.new Shutl::Resource::Error
   Shutl::BadRequest         = Class.new Shutl::Resource::Error
-  Shutl::UnauthorizedAccess = Class.new Shutl::Resource::Error
   Shutl::ForbiddenAccess    = Class.new Shutl::Resource::Error
   Shutl::ResourceNotFound   = Class.new Shutl::Resource::Error
   Shutl::ResourceConflict   = Class.new Shutl::Resource::Error
