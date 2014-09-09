@@ -294,7 +294,6 @@ describe Shutl::Resource::Rest do
           to_return(:status => 403)
 
         lambda { TestRest.all }.should raise_error(Shutl::ForbiddenAccess)
-
       end
 
       context 'ordering the collection' do
@@ -329,6 +328,24 @@ describe Shutl::Resource::Rest do
         TestRest.all(arg1: 'val1', arg2: 'val2')
 
         @request.should have_been_requested
+      end
+    end
+
+    context 'with auth token' do
+      before do
+         stub_request(:get, "http://host/test_rests").
+         with(:headers => {
+           'Authorization'=>'Bearer SECRET_TOKEN',
+           'Accept'=>'application/json',
+           'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
+           'Content-Type'=>'application/json',
+           'User-Agent'=>'Shutl Resource Gem v1.6.0'}).
+         to_return(:status => 200, :body => '{"test_rests": [{ "a": "a", "b": 2 }]}', :headers => {})
+       end
+
+      it 'should not have auth token in the response' do
+        result = TestRest.all(auth: 'SECRET_TOKEN')
+        result.first.attributes.should_not have_key('auth')
       end
     end
   end
