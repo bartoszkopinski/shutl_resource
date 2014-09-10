@@ -89,22 +89,37 @@ module Shutl::Resource
       save args, options
     end
 
+    def split_hash h
+      partitions = h.partition { |key, value| yield key, value }
+      [Hash[partitions.first], Hash[partitions.last]]
+    end
+
+    def split_url_args args
+      split_hash(args) do |key, value|
+        !remote_collection_url.index(":#{key}").nil?
+      end
+    end
+
+    def split_header_args args
+      split_hash(args) do |key, value|
+        %(auth headers from).include?(key.to_s)
+      end
+    end
 
     def all(args = {})
-      partition    = args.partition { |key, value| !remote_collection_url.index(":#{key}").nil? }
+      header_args, non_header_args = split_header_args args
+      url_args, params = split_url_args non_header_args
 
-      url_args = partition.first.inject({}) { |h, pair| h[pair.first] = pair.last; h }
-      params   = partition.last.inject({}) { |h, pair| h[pair.first] = pair.last; h }
+      url = generate_collection_url url_args, params
 
-      url      = generate_collection_url url_args, params
       response = connection.get(url) do |req|
-        req.headers = generate_request_header(header_options(args))
+        req.headers = generate_request_header(header_options(header_args))
       end
 
       check_fail response, "Failed to find all #{name.downcase.pluralize}"
 
       response_object = response.body[@resource_name.pluralize].map do |h|
-        new_object(args.merge(h), response.body)
+        new_object(non_header_args.merge(h), response.body)
       end
       if order_collection?
         response_object.sort! do |a,b|

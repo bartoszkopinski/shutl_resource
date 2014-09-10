@@ -294,7 +294,6 @@ describe Shutl::Resource::Rest do
           to_return(:status => 403)
 
         lambda { TestRest.all }.should raise_error(Shutl::ForbiddenAccess)
-
       end
 
       context 'ordering the collection' do
@@ -329,6 +328,41 @@ describe Shutl::Resource::Rest do
         TestRest.all(arg1: 'val1', arg2: 'val2')
 
         @request.should have_been_requested
+      end
+    end
+
+    describe 'response attributes' do
+      before do
+         stub_request(:get, "http://host/test_rests").
+         with(:headers => {
+           'Authorization'=>'Bearer TOKEN',
+           'Accept'=>'application/json',
+           'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
+           'Content-Type'=>'application/json',
+           'User-Agent'=>'Shutl Resource Gem v1.6.0'}).
+         to_return(:status => 200, :body => '{"test_rests": [{ "a": "a", "b": 2 }]}', :headers => {})
+      end
+
+      let(:result) do
+        TestRest.all(
+          auth: 'TOKEN', 'auth' => 'TOKEN',
+          headers: {some: 'headers'}, 'headers' => {some: 'headers'},
+          from: 'bob@example.com', 'from' => 'bob@example.com')
+      end
+
+      it 'should not have auth token' do
+        result.first.attributes.should_not have_key('auth')
+        result.first.attributes.should_not have_key(:auth)
+      end
+
+      it 'should not have headers' do
+        result.first.attributes.should_not have_key('headers')
+        result.first.attributes.should_not have_key(:headers)
+      end
+
+      it 'should not have from email' do
+        result.first.attributes.should_not have_key('from')
+        result.first.attributes.should_not have_key(:from)
       end
     end
   end
