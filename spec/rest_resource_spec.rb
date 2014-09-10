@@ -339,7 +339,7 @@ describe Shutl::Resource::Rest do
            'Accept'=>'application/json',
            'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
            'Content-Type'=>'application/json',
-           'User-Agent'=>'Shutl Resource Gem v1.6.0'}).
+           'User-Agent'=>"Shutl Resource Gem v#{Shutl::Resource::VERSION}"}).
          to_return(:status => 200, :body => '{"test_rests": [{ "a": "a", "b": 2 }]}', :headers => {})
       end
 
