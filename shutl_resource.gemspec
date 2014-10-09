@@ -19,7 +19,7 @@ Gem::Specification.new do |gem|
   gem.version       = Shutl::Resource::VERSION
 
   gem.add_dependency 'shutl_auth', '~> 0.9.2'
-  gem.add_dependency 'activemodel'
+  gem.add_dependency 'activemodel', '~> 4'
   gem.add_dependency 'faraday'
   gem.add_dependency 'faraday_middleware'
   gem.add_dependency 'faraday-conductivity'
