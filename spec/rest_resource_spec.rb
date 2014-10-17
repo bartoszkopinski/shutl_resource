@@ -156,19 +156,23 @@ describe Shutl::Resource::Rest do
       end
 
       context "422" do
-        before do
-          @default = Shutl::Resource.raise_exceptions_on_validation
-          Shutl::Resource.raise_exceptions_on_validation = true
-        end
+        before { @default = Shutl::Resource.raise_exceptions_on_validation }
+        after  { Shutl::Resource.raise_exceptions_on_validation = @default }
 
-        after do
-          Shutl::Resource.raise_exceptions_on_validation = @default
-        end
         specify do
-          stub_request(:get, 'http://host/test_rests/b').
-            to_return(status: 422)
+          Shutl::Resource.raise_exceptions_on_validation = true
+          stub_request(:get, 'http://host/test_rests/b').to_return(status: 422)
 
           expect(-> { TestRest.find('b') }).to raise_error(Shutl::ResourceInvalid)
+        end
+
+        specify do
+          Shutl::Resource.raise_exceptions_on_validation = false
+          stub_request(:get, 'http://host/test_rests/b').to_return(status: 422, body: '{"errors": {"base":["No quotes for you today"]}}')
+
+          resource =TestRest.find('b')
+
+          resource.valid?.should be_false
         end
       end
 

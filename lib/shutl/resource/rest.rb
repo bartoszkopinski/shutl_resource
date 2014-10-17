@@ -20,6 +20,7 @@ module Shutl::Resource
 
     def initialize(args = {})
       update_attributes args
+      # self.errors = args['errors'] if args.has_key? 'errors'
     end
 
     def as_json(_)
