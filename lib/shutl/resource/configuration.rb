@@ -28,7 +28,7 @@ module Shutl::Resource
 
   module Configuration
     class << self
-      attr_accessor :base_uri, :logger
+      attr_accessor :base_uri, :logger, :proxy_uri
 
       def configure
         yield self

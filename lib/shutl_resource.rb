@@ -18,7 +18,7 @@ Faraday::Middleware.register_middleware :default_logger => :DefaultLogger
 module Shutl::Resource
   extend self
 
-  delegate :logger, :logger=, :base_uri, :base_uri=, to: Configuration
+  delegate :logger, :logger=, :base_uri, :base_uri=, :proxy_uri, :proxy_uri=, to: Configuration
 
   def configure(*args, &block)
     Configuration.configure(*args, &block)

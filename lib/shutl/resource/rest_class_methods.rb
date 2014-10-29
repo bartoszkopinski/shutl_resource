@@ -2,12 +2,16 @@ require 'open-uri'
 module Shutl::Resource
   module RestClassMethods
 
-    def base_uri uri
+    def base_uri(uri)
       @base_uri = uri
     end
 
+    def set_proxy(uri)
+      @proxy_uri = uri
+    end
+
     def connection
-      @connection ||= Faraday.new(:url => @base_uri || Shutl::Resource.base_uri) do |faraday|
+      @connection ||= Faraday.new(url: target_url, proxy: proxy_url) do |faraday|
         faraday.request :url_encoded # form-encode POST params
 
 
@@ -343,7 +347,7 @@ module Shutl::Resource
     def generate_url!(url_pattern, args, params = {})
       url = url_pattern.dup
 
-      args, url = replace_args_from_pattern! args, url
+      _, url = replace_args_from_pattern! args, url
 
       url = URI.escape url
       params = params.except(:headers, :auth, :from, 'headers', 'auth', 'from')
@@ -357,6 +361,14 @@ module Shutl::Resource
 
     def order_collection?
       !!@order_collection_by
+    end
+
+    def target_url
+      @base_uri || Shutl::Resource.base_uri
+    end
+
+    def proxy_url
+      @proxy_uri || Shutl::Resource.proxy_uri
     end
 
     private
