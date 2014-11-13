@@ -368,6 +368,19 @@ describe Shutl::Resource::Rest do
         result.first.attributes.should_not have_key('from')
         result.first.attributes.should_not have_key(:from)
       end
+
+      context 'accepting strings as keys in header hash' do
+        let(:result) do
+          TestRest.all(
+            'auth' => 'TOKEN',
+            'headers' => {some: 'headers'},
+            'from' => 'bob@example.com')
+        end
+
+        it 'should be ok still' do
+          result.first.attributes.should_not have_key('auth')
+        end
+      end
     end
   end
 
