@@ -347,26 +347,28 @@ describe Shutl::Resource::Rest do
          to_return(:status => 200, :body => '{"test_rests": [{ "a": "a", "b": 2 }]}', :headers => {})
       end
 
-      let(:result) do
-        TestRest.all(
-          auth: 'TOKEN', 'auth' => 'TOKEN',
-          headers: {some: 'headers'}, 'headers' => {some: 'headers'},
-          from: 'bob@example.com', 'from' => 'bob@example.com')
-      end
+      context 'accepting symbols as keys in header hash' do
+        let(:result) do
+          TestRest.all(
+            auth: 'TOKEN',
+            headers: {some: 'headers'},
+            from: 'bob@example.com')
+        end
 
-      it 'should not have auth token' do
-        result.first.attributes.should_not have_key('auth')
-        result.first.attributes.should_not have_key(:auth)
-      end
+        it 'should not have auth token' do
+          result.first.attributes.should_not have_key('auth')
+          result.first.attributes.should_not have_key(:auth)
+        end
 
-      it 'should not have headers' do
-        result.first.attributes.should_not have_key('headers')
-        result.first.attributes.should_not have_key(:headers)
-      end
+        it 'should not have headers' do
+          result.first.attributes.should_not have_key('headers')
+          result.first.attributes.should_not have_key(:headers)
+        end
 
-      it 'should not have from email' do
-        result.first.attributes.should_not have_key('from')
-        result.first.attributes.should_not have_key(:from)
+        it 'should not have from email' do
+          result.first.attributes.should_not have_key('from')
+          result.first.attributes.should_not have_key(:from)
+        end
       end
 
       context 'accepting strings as keys in header hash' do
@@ -377,8 +379,19 @@ describe Shutl::Resource::Rest do
             'from' => 'bob@example.com')
         end
 
-        it 'should be ok still' do
+        it 'should not have auth token' do
           result.first.attributes.should_not have_key('auth')
+          result.first.attributes.should_not have_key(:auth)
+        end
+
+        it 'should not have headers' do
+          result.first.attributes.should_not have_key('headers')
+          result.first.attributes.should_not have_key(:headers)
+        end
+
+        it 'should not have from email' do
+          result.first.attributes.should_not have_key('from')
+          result.first.attributes.should_not have_key(:from)
         end
       end
     end
