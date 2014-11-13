@@ -91,7 +91,7 @@ module Shutl::Resource
 
     def split_hash h
       partitions = h.partition { |key, value| yield key, value }
-      [Hash[partitions.first], Hash[partitions.last]]
+      [Hash[partitions.first].with_indifferent_access, Hash[partitions.last].with_indifferent_access]
     end
 
     def split_url_args args
